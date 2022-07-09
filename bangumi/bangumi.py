@@ -49,7 +49,8 @@ class Bangumi(object):
 
         def check():
             logger.info("Checking RSS...")
-            items = self.rss.scrape()
+            last_t = redisDB.get_last_checked_time()
+            items = self.rss.scrape(last_t)
             logger.info("Found %d items", len(items))
             for item in items:
                 redisDB.set(item.hash, item)

@@ -17,12 +17,11 @@ class RSS(object):
             DMHYRSS()
         ]
         self.urls = urls
-        self.__last_scrape_time = 0
         self.__rules = [
             # 正则表达式，会过滤结果
         ]
 
-    def scrape(self) -> List[RSSItem]:
+    def scrape(self, last_scrape_time: int) -> List[RSSItem]:
         """
         在主循环中调用此方法，获取 RSS 数据
         """
@@ -38,18 +37,13 @@ class RSS(object):
                         items += parser.parse(content)
                     break
 
-        items = self.__filter_by_time(items)
+        items = self.__filter_by_time(items, last_scrape_time)
         items = self.__filter_by_rules(items)
-        self.__update_last_scrape_time()
 
         return items
 
-    def __update_last_scrape_time(self) -> None:
-        self.__last_scrape_time = int(time())
-
-    def __filter_by_time(self, items: List[RSSItem]) -> List[RSSItem]:
-        return [item for item in items if item.publish_at >
-                self.__last_scrape_time]
+    def __filter_by_time(self, items: List[RSSItem], last_scrape_time: int) -> List[RSSItem]:
+        return [item for item in items if item.publish_at > last_scrape_time]
 
     def __filter_by_rules(self, items: List[RSSItem]) -> List[RSSItem]:
         ret = []

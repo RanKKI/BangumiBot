@@ -1,14 +1,14 @@
-from collections import defaultdict
 import re
+from collections import defaultdict
 from time import time
 from typing import List
 
+from bangumi.parser import Parser
 from loguru import logger
 
 from .dmhy import DMHYRSS
 from .mikan import MiKanRSS
 from .rss_parser import RSSItem, RSSParser
-from bangumi.parser import Parser
 
 
 class RSS(object):
@@ -23,6 +23,19 @@ class RSS(object):
             # 正则表达式，会过滤结果
         ]
 
+    def scrape_url(self, url: str)-> List[RSSItem]:
+        items = []
+        for parser in self.__parsers:
+            if parser.is_matched(url):
+                content = parser.request_rss(url)
+                if content is None:
+                    logger.error(f"Failed to scrape {url}")
+                else:
+                    items = parser.parse(content)
+        items = self.__filter_by_rules(items)
+        items = self.filter_by_duplicate(items)
+        return items
+
     def scrape(self, last_scrape_time: int) -> List[RSSItem]:
         """
         在主循环中调用此方法，获取 RSS 数据
@@ -30,18 +43,9 @@ class RSS(object):
         items = []
 
         for url in self.urls:
-            for parser in self.__parsers:
-                if parser.is_matched(url):
-                    content = parser.request_rss(url)
-                    if content is None:
-                        logger.error(f"Failed to scrape {url}")
-                    else:
-                        items += parser.parse(content)
-                    break
+            items += self.scrape_url(url)
 
         items = self.__filter_by_time(items, last_scrape_time)
-        items = self.__filter_by_rules(items)
-        items = self.filter_by_duplicate(items)
 
         return items
 

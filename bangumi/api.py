@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from bangumi.database import redisDB
 from bangumi.downloader import Downloader, build_downloader
+from bangumi.rss.rss import RSS
 from bangumi.rss.rss_parser import RSSItem
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,22 @@ async def read_item(infos: List[AddTorrent]):
             url=info.url,
             hash=info.hash,
             publish_at=0
+        ))
+    return {"message": "OK!"}
+
+
+class AddRss(BaseModel):
+    url: str
+
+@app.post("/add_by_rss")
+async def read_item(r: AddRss):
+    for item in RSS(urls=[]).scrape_url(r.url):
+        downloader.add_torrent(item.url)
+        redisDB.set(item.hash, RSSItem(
+            name=item.name,
+            url=item.url,
+            hash=item.hash,
+            publish_at=item.publish_at
         ))
     return {"message": "OK!"}
 

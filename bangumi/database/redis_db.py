@@ -9,6 +9,7 @@ from bangumi.rss import RSSItem
 
 logger = logging.getLogger(__name__)
 
+
 class RedisDB(object):
 
     def __init__(self) -> None:

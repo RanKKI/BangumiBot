@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class TitleInfo:
     def __init__(self) -> None:
@@ -8,17 +9,20 @@ class TitleInfo:
         self.official: str = None
         self.group: list = None
 
+
 @dataclass
 class SeasonInfo:
     def __init__(self) -> None:
         self.raw: str = None
         self.number: int = None
 
+
 @dataclass
 class EpisodeInfo:
     def __init__(self) -> None:
         self.raw: str = None
         self.number: int = None
+
 
 @dataclass
 class Episode:

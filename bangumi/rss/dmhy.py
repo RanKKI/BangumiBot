@@ -8,6 +8,7 @@ import re
 from .rss_parser import RSSItem, RSSParser
 from urllib.parse import urlparse
 
+
 class DMHYRSS(RSSParser):
 
     def is_matched(self, url: str) -> bool:
@@ -21,7 +22,8 @@ class DMHYRSS(RSSParser):
             url = item.find("enclosure").get("url")
             url_parts = urlparse(url)
             pub_date = item.find("pubDate").text
-            pub_datetime = datetime.strptime(pub_date, "%a, %d %b %Y %H:%M:%S %z")
+            pub_datetime = datetime.strptime(
+                pub_date, "%a, %d %b %Y %H:%M:%S %z")
             ret.append(RSSItem(
                 title,
                 url,

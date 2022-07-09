@@ -2,6 +2,7 @@ from enum import Enum
 
 PREFIX = 'BANGUMI_'
 
+
 class Env(Enum):
     CLIENT_TYPE = PREFIX + 'CLIENT_TYPE'
     CLIENT_IP = PREFIX + 'CLIENT_IP'

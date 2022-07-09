@@ -1,7 +1,7 @@
 import logging
 import re
 
-from bangumi.entitiy.episode import Episode
+from bangumi.entitiy import Episode
 
 logger = logging.getLogger(__name__)
 

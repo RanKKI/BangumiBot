@@ -101,17 +101,17 @@ class TestRawParser(unittest.TestCase):
     def test_formatted_title(self):
         cases = [
             ("【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第二季 Komi-san wa, Komyushou Desu. S02】【22】【GB_MP4】【1920X1080】",
-             "Komi-san wa, Komyushou Desu. S2E22"),
+             "Komi-san wa, Komyushou Desu. S02E22"),
             ("[百冬练习组&LoliHouse] BanG Dream! 少女乐团派对！☆PICO FEVER！ / Garupa Pico: Fever! - 26 [WebRip 1080p HEVC-10bit AAC][简繁内封字幕][END] [101.69 MB]",
-             "BanG Dream! 少女乐团派对！☆PICO FEVER！ S1E26"),
+             "BanG Dream! 少女乐团派对！☆PICO FEVER！ S01E26"),
             ("【喵萌奶茶屋】★04月新番★[夏日重现/Summer Time Rendering][11][1080p][繁日双语][招募翻译] [539.4 MB]",
-             "Summer Time Rendering S1E11"),
+             "Summer Time Rendering S01E11"),
             ("【喵萌奶茶屋】★04月新番★[夏日重现/Summer Time Rendering][01][1080p][繁日双语][招募翻译] [539.4 MB]",
-             "Summer Time Rendering S1E1"),
+             "Summer Time Rendering S01E01"),
             ("【喵萌奶茶屋】★04月新番★[夏日重现/Summer Time Rendering][29][1080p][繁日双语][招募翻译] [539.4 MB]",
-             "Summer Time Rendering S1E29"),
+             "Summer Time Rendering S01E29"),
             ("【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第一季 Komi-san wa, Komyushou Desu. S01】【31】【GB_MP4】【1920X1080】",
-             "Komi-san wa, Komyushou Desu. S1E31"),
+             "Komi-san wa, Komyushou Desu. S01E31"),
         ]
         parser = Parser()
         for raw, expected in cases:

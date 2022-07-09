@@ -46,4 +46,6 @@ class Episode:
 
     @property
     def formatted(self) -> str:
-        return f"{self.title} S{self.season_info.number}E{self.ep_info.number}"
+        season = str(self.season_info.number).zfill(2)
+        ep = str(self.ep_info.number).zfill(2)
+        return f"{self.title} S{season}E{ep}"

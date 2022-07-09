@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import List
 from dotenv import load_dotenv
 
 import uvicorn
@@ -21,7 +22,7 @@ class AddTorrent(BaseModel):
 app = FastAPI()
 downloader: Downloader
 
-@app.post("/add")
+@app.post("/add_torrent")
 async def read_item(info: AddTorrent):
     downloader.add_torrent(info.url)
     redisDB.set(info.hash, RSSItem(
@@ -30,6 +31,18 @@ async def read_item(info: AddTorrent):
         hash=info.hash,
         publish_at=0
     ))
+    return {"message": "OK!"}
+
+@app.post("/add_torrents")
+async def read_item(infos: List[AddTorrent]):
+    for info in infos:
+        downloader.add_torrent(info.url)
+        redisDB.set(info.hash, RSSItem(
+            name=info.name,
+            url=info.url,
+            hash=info.hash,
+            publish_at=0
+        ))
     return {"message": "OK!"}
 
 if not os.environ.get("GITHUB_ACTIONS"):

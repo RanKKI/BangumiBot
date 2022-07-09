@@ -16,6 +16,9 @@ class RedisDB(object):
         self.client: redis.Redis = None
 
     def connect(self) -> None:
+        if self.client is not None:
+            logger.debug("RedisDB already connected")
+            return
         logger.info("Connecting to Redis...")
         self.client = redis.Redis(
             host=os.environ.get(Env.REDIS_HOST.value, "localhost"),
@@ -32,8 +35,8 @@ class RedisDB(object):
             return None
         return RSSItem(
             name=ret.get("name"),
-            url=ret.get("url"),
-            publish_at=int(ret.get("publish_at")),
+            url=ret.get("url", ""),
+            publish_at=int(ret.get("publish_at", "0")),
             hash=hash_,
         )
 

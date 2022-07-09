@@ -1,6 +1,7 @@
 
 import logging
 import os
+import threading
 from pathlib import Path
 from time import sleep, time
 
@@ -16,6 +17,7 @@ logger = logging.getLogger(__name__)
 class Bangumi(object):
 
     def __init__(self) -> None:
+        super().__init__()
         self.downloader = build_downloader()
         self.rss = RSS(urls=[
             # "https://dmhy.org/topics/rss/rss.xml"
@@ -52,7 +54,6 @@ class Bangumi(object):
             for item in items:
                 redisDB.set(item.hash, item)
                 self.downloader.add_torrent(item.url)
-                break
 
         def check_complete():
             completed = self.downloader.get_downloads(DownloadState.FINISHED)

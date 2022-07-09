@@ -28,12 +28,6 @@ class Aria2Downloader(Downloader):
         files = [x.path for x in item.files]
         return DownloadItem(id=item.info_hash, name=item.name, files=files)
 
-    def on_download_complete(self, gid: str):
-        item = self.client.get_download(gid)
-        self._on_torrent_finished(
-            self.__wrap_aria2_item(item)
-        )
-
     def add_torrent_by_magnet(self, magnet: str) -> DownloadItem:
         item = self.client.add_magnet(magnet)
         return self.__wrap_aria2_item(item)

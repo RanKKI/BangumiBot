@@ -29,7 +29,7 @@ class RedisDB(object):
         ret = self.client.info()
         logger.info(f"Connected to Redis, version {ret['redis_version']}")
 
-    def get(self, hash_: str) -> RSSItem | None:
+    def get(self, hash_: str) -> RSSItem:
         ret = self.client.hgetall(hash_)
         if not ret:
             return None

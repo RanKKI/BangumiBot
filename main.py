@@ -3,7 +3,6 @@ import logging
 from dotenv import load_dotenv
 
 from bangumi import Bangumi
-from bangumi.api import start_api_server
 from bangumi.util import init_folders, setup_logger
 
 logger = logging.getLogger(__name__)

@@ -102,7 +102,7 @@ class Parser:
         return Parser.clean_sub(sub), resolution, source
 
     @staticmethod
-    def clean_sub(sub: str | None) -> str | None:
+    def clean_sub(sub: str) -> str:
         if sub is None:
             return sub
         # TODO: 这里需要改成更精准的匹配，可能不止 _MP4 ?

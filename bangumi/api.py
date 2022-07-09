@@ -1,4 +1,5 @@
 import logging
+import os
 from dotenv import load_dotenv
 
 import uvicorn
@@ -31,6 +32,10 @@ async def read_item(info: AddTorrent):
     ))
     return {"message": "OK!"}
 
-load_dotenv(".env")
-downloader = build_downloader()
-redisDB.connect()
+if not os.environ.get("GITHUB_ACTIONS"):
+    """
+    GitHub CI/CD 中不执行
+    """
+    load_dotenv(".env")
+    downloader = build_downloader()
+    redisDB.connect()

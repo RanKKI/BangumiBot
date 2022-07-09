@@ -48,7 +48,8 @@ class RSS(object):
         self.__last_scrape_time = int(time())
 
     def __filter_by_time(self, items: List[RSSItem]) -> List[RSSItem]:
-        return [item for item in items if item.publish_at > self.__last_scrape_time]
+        return [item for item in items if item.publish_at >
+                self.__last_scrape_time]
 
     def __filter_by_rules(self, items: List[RSSItem]) -> List[RSSItem]:
         ret = []
@@ -63,4 +64,3 @@ class RSS(object):
                 ret.append(item)
 
         return ret
-

@@ -13,6 +13,7 @@ from bangumi.util.const import Env
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class DownloadItem:
     id: str  # torrent hash
@@ -21,8 +22,11 @@ class DownloadItem:
 
     def __eq__(self, other):
         if not isinstance(other, DownloadItem):
-            raise TypeError("Can't compare DownloadItem with {}".format(type(other)))
+            raise TypeError(
+                "Can't compare DownloadItem with {}".format(
+                    type(other)))
         return self.id == other.id
+
 
 class DownloadState(Enum):
     NONE = 0
@@ -31,13 +35,18 @@ class DownloadState(Enum):
     FINISHED = 3
     ERROR = 4
 
+
 TorrentFinishedCB = Callable[[DownloadItem], None]
+
 
 class Downloader(ABC):
 
     def __init__(self):
         self.on_torrent_finished_callback: TorrentFinishedCB = None
-        self.cache_folder = Path(os.environ.get(Env.CACHE_FOLDER.value, ".cache"))
+        self.cache_folder = Path(
+            os.environ.get(
+                Env.CACHE_FOLDER.value,
+                ".cache"))
 
     def add_torrent(self, url_or_magnet: str) -> bool:
         logger.debug(f"Adding torrent {url_or_magnet}")
@@ -48,7 +57,7 @@ class Downloader(ABC):
 
         raise ValueError("Invalid url or magnet: {}".format(url_or_magnet))
 
-    def add_torrent_by_url(self, url: str)-> DownloadItem:
+    def add_torrent_by_url(self, url: str) -> DownloadItem:
         file_data = requests.get(url)
         file_name = md5(url.encode()).hexdigest() + ".torrent"
         file_path = self.cache_folder / file_name
@@ -71,5 +80,7 @@ class Downloader(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_downloads(self, state: DownloadState = DownloadState.NONE) -> List[DownloadItem]:
+    def get_downloads(
+            self,
+            state: DownloadState = DownloadState.NONE) -> List[DownloadItem]:
         raise NotImplementedError()

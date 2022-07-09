@@ -44,7 +44,8 @@ class Aria2Downloader(Downloader):
 
     def remove_torrent(self, item: DownloadItem) -> bool:
         downloads = self.client.get_downloads()
-        targets = [download for download in downloads if download.info_hash == item.id]
+        targets = [
+            download for download in downloads if download.info_hash == item.id]
 
         if len(targets) == 0:
             return False
@@ -54,7 +55,7 @@ class Aria2Downloader(Downloader):
 
         return all(self.client.remove(targets, force=True, clean=True))
 
-    def get_downloads(self, state: DownloadState = ...) ->  List[DownloadItem]:
+    def get_downloads(self, state: DownloadState = ...) -> List[DownloadItem]:
         downloads = self.client.get_downloads()
         ret = []
 

@@ -66,7 +66,7 @@ class Parser:
     @staticmethod
     def name_process(name: str):
         name = name.strip()
-        split = re.split("/|\s{2}|-\s{2}", name.replace("（仅限港澳台地区）", ""))
+        split = re.split(r"/|\s{2}|-\s{2}", name.replace("（仅限港澳台地区）", ""))
         while "" in split:
             split.remove("")
         if len(split) == 1:
@@ -116,7 +116,8 @@ class Parser:
         season_info, episode_info, other = list(map(
             lambda x: x.strip(), match_obj.groups()
         ))
-        raw_name, season_raw, season = self.season_process(season_info)  # 处理 第n季
+        raw_name, season_raw, season = self.season_process(
+            season_info)  # 处理 第n季
         name, name_group = "", ""
         try:
             name, name_group = self.name_process(raw_name)  # 处理 名字

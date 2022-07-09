@@ -16,6 +16,7 @@ class RSSItem:
     publish_at: int
     hash: str
 
+
 class RSSParser(ABC):
 
     def request_rss(self, url: str) -> bs4.BeautifulSoup | None:

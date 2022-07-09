@@ -2,6 +2,8 @@ import re
 from time import time
 from typing import List
 
+from loguru import logger
+
 from .dmhy import DMHYRSS
 from .mikan import MiKanRSS
 from .rss_parser import RSSItem, RSSParser
@@ -30,7 +32,10 @@ class RSS(object):
             for parser in self.__parsers:
                 if parser.is_matched(url):
                     content = parser.request_rss(url)
-                    items += parser.parse(content)
+                    if content is None:
+                        logger.error(f"Failed to scrape {url}")
+                    else:
+                        items += parser.parse(content)
                     break
 
         items = self.__filter_by_time(items)

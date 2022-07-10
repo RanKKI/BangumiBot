@@ -12,7 +12,10 @@ def main():
     load_dotenv(".env")
     setup_logger()
     init_folders()
-    Bangumi().run()
+    try:
+        Bangumi().run()
+    except KeyboardInterrupt:
+        logger.info("Shutting down...")
 
 if __name__ == '__main__':
     main()

@@ -1,28 +1,41 @@
-from turtle import down
+import json
+import logging
 from typing import List
 
+import requests
 from aria2p import API, Client, Download
 
 from .downloader import Downloader, DownloadItem, DownloadState
 
+
+logger = logging.getLogger(__name__)
 
 class Aria2Downloader(Downloader):
 
     def __init__(self, **kwargs):
         super().__init__()
 
-        assert 'host' in kwargs, 'Aria2Downloader requires host'
-        assert 'port' in kwargs, 'Aria2Downloader requires port'
-        assert 'secret' in kwargs, 'Aria2Downloader requires secret'
+        host = kwargs.pop('host', 'localhost')
+        if not host.startswith('http'):
+            host = 'http://' + host
 
-        kwargs.pop("downloader_url", None)
+        port = kwargs.pop('port', 6800)
+        secret = kwargs.pop('secret', '')
+
+        logger.info(f"Aria2 Connecting to {host}:{port}")
+
         self.client = API(
             Client(
-                host=kwargs.pop('host'),
-                port=kwargs.pop('port'),
-                secret=kwargs.pop('secret')
+                host=host,
+                port=port,
+                secret=secret
             )
         )
+
+        try:
+            self.client.get_stats()
+        except Exception:
+            logger.error("Aria2 failed to connect")
 
     def __wrap_aria2_item(self, item: Download) -> DownloadItem:
         files = [x.path for x in item.files]
@@ -37,7 +50,12 @@ class Aria2Downloader(Downloader):
         return self.__wrap_aria2_item(item)
 
     def remove_torrent(self, item: DownloadItem) -> bool:
-        downloads = self.client.get_downloads()
+        try:
+            downloads = self.client.get_downloads()
+        except Exception:
+            logger.error("Failed to remove torrent")
+            return False
+
         targets = [
             download for download in downloads if download.info_hash == item.id]
 
@@ -50,14 +68,20 @@ class Aria2Downloader(Downloader):
         return all(self.client.remove(targets, force=True, clean=True))
 
     def get_downloads(self, state: DownloadState = ...) -> List[DownloadItem]:
-        downloads = self.client.get_downloads()
+        try:
+            downloads = self.client.get_downloads()
+        except Exception:
+            logger.error("Failed to get downloads")
+            return []
+
+        if state == DownloadState.NONE:
+            return [self.__wrap_aria2_item(download) for download in downloads]
+
         ret = []
 
         for download in downloads:
             add = False
-            if state == DownloadState.NONE:
-                add = True
-            elif state == DownloadState.DOWNLOADING:
+            if state == DownloadState.DOWNLOADING:
                 if download.status == "active" and download.completed_length < download.total_length:
                     add = True
             elif state == DownloadState.FINISHED:

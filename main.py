@@ -1,15 +1,13 @@
 import logging
 
-from dotenv import load_dotenv
-
 from bangumi import Bangumi
-from bangumi.util import init_folders, setup_logger
+from bangumi.util import init_folders, setup_env, setup_logger
 
 logger = logging.getLogger(__name__)
 
 
 def main():
-    load_dotenv(".env")
+    setup_env()
     setup_logger()
     init_folders()
     try:

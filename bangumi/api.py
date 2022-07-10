@@ -1,9 +1,8 @@
 import logging
 import os
+import sys
 from typing import List
-from dotenv import load_dotenv
 
-import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -11,6 +10,7 @@ from bangumi.database import redisDB
 from bangumi.downloader import Downloader, build_downloader
 from bangumi.rss.rss import RSS
 from bangumi.rss.rss_parser import RSSItem
+from bangumi.util import setup_env
 
 logger = logging.getLogger(__name__)
 
@@ -62,10 +62,10 @@ async def read_item(r: AddRss):
         ))
     return {"message": "OK!"}
 
-if not os.environ.get("GITHUB_ACTIONS"):
+if not os.environ.get("GITHUB_ACTIONS") and not sys.argv[0] == "main.py":
     """
     GitHub CI/CD 中不执行
     """
-    load_dotenv(".env")
+    setup_env()
     downloader = build_downloader()
     redisDB.connect()

@@ -5,7 +5,7 @@ from pathlib import Path
 from time import sleep, time
 
 from bangumi.database import redisDB
-from bangumi.downloader import DownloadItem, DownloadState, build_downloader
+from bangumi.downloader import DownloadItem, DownloadState, build_downloader, Downloader
 from bangumi.parser import Parser
 from bangumi.rss import RSS
 from bangumi.util import Env, move_file
@@ -17,7 +17,7 @@ class Bangumi(object):
 
     def __init__(self) -> None:
         super().__init__()
-        self.downloader = build_downloader()
+        self.downloader: Downloader
         self.rss = RSS(urls=[
             # "https://dmhy.org/topics/rss/rss.xml"
             "https://mikanani.me/RSS/MyBangumi?token=2O6Rl47PH1mXSw6v3ACwCA%3d%3d"
@@ -86,4 +86,5 @@ class Bangumi(object):
     def run(self):
         logger.info("Starting...")
         redisDB.connect()
+        self.downloader = build_downloader()
         self.loop()

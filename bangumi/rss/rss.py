@@ -1,6 +1,6 @@
+import os
 import re
 from collections import defaultdict
-from time import time
 from typing import List
 
 from bangumi.parser import Parser
@@ -34,6 +34,7 @@ class RSS(object):
                     items = parser.parse(content)
         items = self.__filter_by_rules(items)
         items = self.filter_by_duplicate(items)
+        items = self.filter_exists(items)
         return items
 
     def scrape(self, last_scrape_time: int) -> List[RSSItem]:
@@ -46,6 +47,9 @@ class RSS(object):
             items += self.scrape_url(url)
 
         items = self.__filter_by_time(items, last_scrape_time)
+        items = self.__filter_by_rules(items)
+        items = self.filter_by_duplicate(items)
+        items = self.filter_exists(items)
 
         return items
 
@@ -67,6 +71,12 @@ class RSS(object):
         return ret
 
     def filter_by_duplicate(self, items: List[RSSItem]) -> List[RSSItem]:
+        """
+        对重复的 RSS 数据进行过滤
+        根据分辨率选择最高清的
+
+        TODO: 语言优先级的处理
+        """
         ret = []
         parser = Parser()
         seen = defaultdict(lambda: [])
@@ -90,4 +100,26 @@ class RSS(object):
             val = sorted(val, key=lambda x:get_dpi_idx(x[1]))
             ret.append(val[0][0])
 
+        return ret
+
+    def filter_exists(self, items: List[RSSItem]) -> List[RSSItem]:
+        """
+        对已经存在（本地）的 RSS 数据进行过滤
+        避免重复抓取
+        """
+        ret = []
+        parser = Parser()
+        for item in items:
+            info = parser.analyse(item.name)
+            path = info.get_full_path("")
+            exists = False
+            for file in path.parent.glob("*"):
+                if not file.is_file():
+                    continue
+                file_name, _ = os.path.splitext(file.name)
+                if file_name == path.name:
+                    exists = True
+                    break
+            if not exists:
+                ret.append(item)
         return ret

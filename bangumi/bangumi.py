@@ -37,7 +37,7 @@ class Bangumi(object):
         file = item.files[0]
         result = self.parser.analyse(rss_item.name)
         logger.info(f"Renaming {file.name} to {result.formatted}")
-        move_file(file, Path(result.title) / f"Season {result.season_info.number}", result.formatted)
+        move_file(file, result)
 
     def on_torrent_finished(self, item: DownloadItem):
         self.rename(item)

@@ -1,17 +1,33 @@
 import os
 from pathlib import Path
+import shutil
 
+from bangumi.entitiy.episode import Episode
 from bangumi.util.const import Env
 
 
-def move_file(file: Path, folder_name: str, new_file_name: str) -> None:
-    media_folder = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
+def move_file(file: Path, result: Episode) -> None:
     download_folder = Path(os.environ.get(Env.DOWNLOAD_FOLDER.value, "downloads"))
     ext = os.path.splitext(file.name)[1]
-    target_folder = media_folder / folder_name
-    target_folder.mkdir(parents=True, exist_ok=True)
-    target_file = target_folder / f"{new_file_name}{ext}"
-
+    target_file = result.get_full_path(ext=ext)
+    target_file.parent.mkdir(parents=True, exist_ok=True)
     abs_download_file = download_folder / file.name
-
     abs_download_file.rename(target_file)
+
+def setup_test_env() -> Path:
+    """
+    测试环境初始化
+    """
+    cache_path = Path("./.cache")
+    shutil.rmtree(cache_path, ignore_errors=True)
+
+    cache_path.mkdir(parents=True, exist_ok=True)
+
+    (cache_path / "media").mkdir(parents=True, exist_ok=True)
+
+    os.environ.update({
+        Env.MEDIA_FOLDER.value: "./.cache/media",
+        Env.DOWNLOAD_FOLDER.value: "./.cache"
+    })
+
+    return cache_path

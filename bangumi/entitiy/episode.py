@@ -1,5 +1,9 @@
 from dataclasses import dataclass
+import os
+from pathlib import Path
+from turtle import st
 
+from bangumi.util.const import Env
 
 @dataclass
 class TitleInfo:
@@ -49,3 +53,7 @@ class Episode:
         season = str(self.season_info.number).zfill(2)
         ep = str(self.ep_info.number).zfill(2)
         return f"{self.title} S{season}E{ep}"
+
+    def get_full_path(self, ext: str) -> Path:
+        media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
+        return media / Path(self.title) / f"Season {self.season_info.number}" / f"{self.formatted}{ext}"

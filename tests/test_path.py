@@ -38,8 +38,8 @@ class TestRawParser(unittest.TestCase):
         episode = parser.analyse(title)
 
         val = str(random())
-        filename = Path("test")
-        with open(self.cache_path / filename, "w") as f:
+        filename = self.cache_path / Path("test")
+        with open(filename, "w") as f:
             f.write(val)
         move_file(filename, episode)
         path = episode.get_full_path()

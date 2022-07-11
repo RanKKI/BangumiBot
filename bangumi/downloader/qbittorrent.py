@@ -48,6 +48,7 @@ class QBittorrentDownloader(Downloader):
             password=password,
         )
 
+    def connect(self):
         try:
             self.client.auth_log_in()
             logger.info(f'qBittorrent: {self.client.app.version}')

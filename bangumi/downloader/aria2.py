@@ -52,6 +52,7 @@ class Aria2Downloader(Downloader):
             )
         )
 
+    def connect(self):
         try:
             ver = self.client.client.get_version()
             if isinstance(ver, dict):

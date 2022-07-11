@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  GITHUB_ACTIONS: True
+  TEST_ENV: True
 
 jobs:
   build:

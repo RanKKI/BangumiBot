@@ -5,14 +5,18 @@ import shutil
 from bangumi.entitiy.episode import Episode
 from bangumi.util.const import Env
 
+def get_relative_path(path: Path) -> Path:
+    """
+    获取相对路径
+    """
+    download_folder = Path(os.environ.get(Env.DOWNLOAD_FOLDER.value, "downloads"))
+    return download_folder / path.name
 
 def move_file(file: Path, result: Episode) -> None:
-    download_folder = Path(os.environ.get(Env.DOWNLOAD_FOLDER.value, "downloads"))
     ext = os.path.splitext(file.name)[1]
     target_file = result.get_full_path(ext=ext)
     target_file.parent.mkdir(parents=True, exist_ok=True)
-    abs_download_file = download_folder / file.name
-    abs_download_file.rename(target_file)
+    file.rename(target_file)
 
 def setup_test_env() -> Path:
     """

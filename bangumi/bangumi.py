@@ -9,6 +9,7 @@ from bangumi.downloader import DownloadItem, DownloadState, build_downloader, Do
 from bangumi.parser import Parser
 from bangumi.rss import RSS
 from bangumi.util import Env, move_file
+from bangumi.util.files import get_relative_path
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,7 @@ class Bangumi(object):
             return False
 
         file = item.files[0]
+        file = get_relative_path(file)
 
         if not file.exists():
             logger.error(f"File {file} doesn't exist")
@@ -102,4 +104,5 @@ class Bangumi(object):
         logger.info("Starting...")
         redisDB.connect()
         self.downloader = build_downloader()
+        self.downloader.connect()
         self.loop()

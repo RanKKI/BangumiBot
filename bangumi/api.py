@@ -62,7 +62,7 @@ async def read_item(r: AddRss):
         ))
     return {"message": "OK!"}
 
-if not os.environ.get("GITHUB_ACTIONS") and not sys.argv[0] == "main.py":
+if not os.environ.get("TEST_ENV") and not sys.argv[0] == "main.py":
     """
     GitHub CI/CD 中不执行
     """

@@ -64,6 +64,10 @@ class Downloader(ABC):
         return self.add_torrent_by_file(file_path)
 
     @abstractmethod
+    def connect(self):
+        pass
+
+    @abstractmethod
     def add_torrent_by_magnet(self, magnet: str) -> bool:
         raise NotImplementedError()
 

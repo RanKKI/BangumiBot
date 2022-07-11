@@ -40,7 +40,7 @@ class Bangumi(object):
         file = item.files[0]
 
         if not file.exists():
-            logger.error(f"File {file.path} doesn't exist")
+            logger.error(f"File {file} doesn't exist")
             return False
 
         result = self.parser.analyse(rss_item.name)

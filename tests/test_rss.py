@@ -55,7 +55,7 @@ class TestRawParser(unittest.TestCase):
             ])
 
     def test_exists(self):
-        rss = RSS(urls=[])
+        rss = RSS()
         item = RSSItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][1080p][繁日双语][招募翻译] [539.4 MB]",
                 url="",

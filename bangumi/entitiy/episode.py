@@ -54,6 +54,6 @@ class Episode:
         ep = str(self.ep_info.number).zfill(2)
         return f"{self.title} S{season}E{ep}"
 
-    def get_full_path(self, ext: str) -> Path:
+    def get_full_path(self, ext: str = "") -> Path:
         media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
         return media / Path(self.title) / f"Season {self.season_info.number}" / f"{self.formatted}{ext}"

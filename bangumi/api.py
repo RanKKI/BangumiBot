@@ -52,7 +52,7 @@ class AddRss(BaseModel):
 
 @app.post("/add_by_rss")
 async def read_item(r: AddRss):
-    for item in RSS(urls=[]).scrape_url(r.url):
+    for item in RSS().scrape_url(r.url):
         downloader.add_torrent(item.url)
         redisDB.set(item.hash, RSSItem(
             name=item.name,

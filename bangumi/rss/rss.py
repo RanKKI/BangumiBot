@@ -13,12 +13,12 @@ from .rss_parser import RSSItem, RSSParser
 
 class RSS(object):
 
-    def __init__(self, urls: List[str]) -> None:
+    def __init__(self, urls: List[str] = None) -> None:
         self.__parsers: List[RSSParser] = [
             MiKanRSS(),
             DMHYRSS()
         ]
-        self.urls = urls
+        self.urls = urls or []
         self.__rules = [
             # 正则表达式，会过滤结果
         ]
@@ -111,7 +111,7 @@ class RSS(object):
         parser = Parser()
         for item in items:
             info = parser.analyse(item.name)
-            path = info.get_full_path("")
+            path = info.get_full_path()
             exists = False
             for file in path.parent.glob("*"):
                 if not file.is_file():

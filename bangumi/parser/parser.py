@@ -1,3 +1,10 @@
+"""
+该文件代码来自于 https://github.com/EstrellaXD/Auto_Bangumi/blob/c9c2b28389aac6ac4d778cdc7de1a77ca024b97e/auto_bangumi/parser/analyser/raw_parser.py
+
+作者: EstrellaXD
+协议: MIT
+"""
+
 import logging
 import re
 

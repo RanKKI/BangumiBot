@@ -1,14 +1,34 @@
+from functools import wraps
 import json
 import logging
-from typing import List
+from typing import Any, List
 
-import requests
-from aria2p import API, Client, Download
+from aria2p import API, Client, Download, ClientException
 
 from .downloader import Downloader, DownloadItem, DownloadState
 
 
 logger = logging.getLogger(__name__)
+
+def handle_api_error(default_val: Any):
+
+    def _inner(func):
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except ClientException:
+                logger.error("[%s] Failed to connect to aria2", func.__name__)
+
+                if callable(default_val):
+                    return default_val()
+
+                return default_val
+
+        return wrapper
+
+    return _inner
 
 class Aria2Downloader(Downloader):
 
@@ -33,31 +53,35 @@ class Aria2Downloader(Downloader):
         )
 
         try:
-            self.client.get_stats()
-        except Exception:
-            logger.error("Aria2 failed to connect")
+            ver = self.client.client.get_version()
+            if isinstance(ver, dict):
+                logger.info("Connected to aria2: %s", ver['version'])
+            else:
+                logger.info("Connected to aria2: %s", ver)
+        except Exception as e:
+            logger.error(f"Aria2 failed to connect {e}")
 
     def __wrap_aria2_item(self, item: Download) -> DownloadItem:
         files = [x.path for x in item.files]
-        return DownloadItem(id=item.info_hash, name=item.name, files=files)
+        return DownloadItem(
+            id=item.info_hash,
+            name=item.name,
+            files=files
+        )
 
-    def add_torrent_by_magnet(self, magnet: str) -> DownloadItem:
-        item = self.client.add_magnet(magnet)
-        return self.__wrap_aria2_item(item)
+    @handle_api_error(False)
+    def add_torrent_by_magnet(self, magnet: str) -> bool:
+        self.client.add_magnet(magnet)
 
-    def add_torrent_by_file(self, torrent_file: str) -> DownloadItem:
-        item = self.client.add_torrent(torrent_file)
-        return self.__wrap_aria2_item(item)
+    @handle_api_error(False)
+    def add_torrent_by_file(self, torrent_file: str) -> bool:
+        self.client.add_torrent(torrent_file)
 
+    @handle_api_error(False)
     def remove_torrent(self, item: DownloadItem) -> bool:
-        try:
-            downloads = self.client.get_downloads()
-        except Exception:
-            logger.error("Failed to remove torrent")
-            return False
+        downloads = self.client.get_downloads()
 
-        targets = [
-            download for download in downloads if download.info_hash == item.id]
+        targets = [download for download in downloads if download.info_hash == item.id]
 
         if len(targets) == 0:
             return False
@@ -67,12 +91,9 @@ class Aria2Downloader(Downloader):
 
         return all(self.client.remove(targets, force=True, clean=True))
 
+    @handle_api_error(lambda: [])
     def get_downloads(self, state: DownloadState = ...) -> List[DownloadItem]:
-        try:
-            downloads = self.client.get_downloads()
-        except Exception:
-            logger.error("Failed to get downloads")
-            return []
+        downloads = self.client.get_downloads()
 
         if state == DownloadState.NONE:
             return [self.__wrap_aria2_item(download) for download in downloads]

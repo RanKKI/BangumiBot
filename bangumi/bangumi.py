@@ -28,11 +28,14 @@ class Bangumi(object):
         logger.info(f"Renaming {item.id} {item.name}...")
         rss_item = redisDB.get(item.id)
         if not rss_item:
-            raise Exception(f"RSS item not found in Redis")
+            logger.error(f"Can't find RSS item in Redis for {item.id}")
+            return
         if len(item.files) > 1:
-            raise Exception("Too many files")
+            logger.error(f"Can't rename multi-file torrent {item.id}")
+            return
         if len(item.files) == 0:
-            raise Exception("No files")
+            logger.error(f"Can't rename empty torrent {item.id}")
+            return
 
         file = item.files[0]
         result = self.parser.analyse(rss_item.name)

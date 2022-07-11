@@ -24,26 +24,38 @@ class Bangumi(object):
         ])
         self.parser = Parser()
 
-    def rename(self, item: DownloadItem):
+    def rename(self, item: DownloadItem) -> bool:
         logger.info(f"Renaming {item.id} {item.name}...")
         rss_item = redisDB.get(item.id)
         if not rss_item:
             logger.error(f"Can't find RSS item in Redis for {item.id}")
-            return
+            return False
         if len(item.files) > 1:
             logger.error(f"Can't rename multi-file torrent {item.id}")
-            return
+            return False
         if len(item.files) == 0:
             logger.error(f"Can't rename empty torrent {item.id}")
-            return
+            return False
 
         file = item.files[0]
+
+        if not file.exists():
+            logger.error(f"File {file.path} doesn't exist")
+            return False
+
         result = self.parser.analyse(rss_item.name)
         logger.info(f"Renaming {file.name} to {result.formatted}")
-        move_file(file, result)
+        try:
+            move_file(file, result)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to rename {e}")
+        return False
 
     def on_torrent_finished(self, item: DownloadItem):
-        self.rename(item)
+        ret = self.rename(item)
+        if not ret:
+            return
         redisDB.remove(item.id)
         self.downloader.remove_torrent(item)
 

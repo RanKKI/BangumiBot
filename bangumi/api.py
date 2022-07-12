@@ -1,9 +1,7 @@
 import logging
-import os
-import sys
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from pydantic import BaseModel
 
 from bangumi.database import redisDB
@@ -33,11 +31,14 @@ async def add_torrents(items: List[AddTorrent]):
     redisDB.add_to_torrent_queue([WaitDownloadItem(item.name, item.url) for item in items])
     return {"message": "OK!"}
 
-@app.post("/add_by_rss")
-async def add_torrents_by_rss(r: AddRss):
-    items = await RSS().scrape_url(r.url)
+def scrape_url(url: str):
+    items = RSS().scrape_url(url)
     redisDB.add_to_torrent_queue(items)
-    return {"message": "OK!", "count": items}
+
+@app.post("/add_by_rss")
+async def add_torrents_by_rss(r: AddRss, background_tasks: BackgroundTasks):
+    background_tasks.add_task(scrape_url, r.url)
+    return {"message": "OK!"}
 
 @app.on_event("startup")
 def startup():

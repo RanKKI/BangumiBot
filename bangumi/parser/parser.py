@@ -1,5 +1,5 @@
 """
-该文件代码来自于 https://github.com/EstrellaXD/Auto_Bangumi/blob/c9c2b28389aac6ac4d778cdc7de1a77ca024b97e/auto_bangumi/parser/analyser/raw_parser.py
+该文件代码来自于 https://github.com/EstrellaXD/Auto_Bangumi/blob/c9c2b28389aac6ac4d778cdc7de1a77ca024b97e/auto_bangumi/Parser/analyser/raw_Parser.py
 
 作者: EstrellaXD
 协议: MIT
@@ -7,6 +7,7 @@
 
 import logging
 import re
+from typing import Union
 
 from bangumi.entitiy import Episode
 
@@ -45,7 +46,7 @@ class Parser:
         return raw_name.replace("【", "[").replace("】", "]")
 
     @staticmethod
-    def season_process(season_info: str):
+    def __season_process(season_info: str):
         if re.search(r"新番|月?番", season_info):
             name_season = re.sub(".*新番.", "", season_info)
         else:
@@ -71,7 +72,7 @@ class Parser:
         return name, season_raw, season
 
     @staticmethod
-    def name_process(name: str):
+    def __name_process(name: str):
         name = name.strip()
         split = re.split(r"/|\s{2}|-\s{2}", name.replace("（仅限港澳台地区）", ""))
         while "" in split:
@@ -106,28 +107,29 @@ class Parser:
                 resolution = element
             elif SOURCE_RE.search(element):
                 source = element
-        return Parser.clean_sub(sub), resolution, source
+        return Parser.__clean_sub(sub), resolution, source
 
     @staticmethod
-    def clean_sub(sub: str) -> str:
+    def __clean_sub(sub: str) -> str:
         if sub is None:
             return sub
         # TODO: 这里需要改成更精准的匹配，可能不止 _MP4 ?
         return re.sub(r"_MP4|_MKV", "", sub)
 
-    def process(self, raw_title: str):
+    @staticmethod
+    def __process(raw_title: str):
         raw_title = raw_title.strip()
-        content_title = self.pre_process(raw_title)  # 预处理标题
-        group = self.get_group(content_title)  # 翻译组的名字
+        content_title = Parser.pre_process(raw_title)  # 预处理标题
+        group = Parser.get_group(content_title)  # 翻译组的名字
         match_obj = TITLE_RE.match(content_title)  # 处理标题
         season_info, episode_info, other = list(map(
             lambda x: x.strip(), match_obj.groups()
         ))
-        raw_name, season_raw, season = self.season_process(
+        raw_name, season_raw, season = Parser.__season_process(
             season_info)  # 处理 第n季
         name, name_group = "", ""
         try:
-            name, name_group = self.name_process(raw_name)  # 处理 名字
+            name, name_group = Parser.__name_process(raw_name)  # 处理 名字
         except ValueError:
             pass
         # 处理 集数
@@ -135,18 +137,19 @@ class Parser:
         episode = 0
         if raw_episode is not None:
             episode = int(raw_episode.group())
-        sub, dpi, source = self.find_tags(other)  # 剩余信息处理
+        sub, dpi, source = Parser.find_tags(other)  # 剩余信息处理
         return name, season, season_raw, episode, sub, dpi, source, name_group, group
 
-    def analyse(self, raw):
+    @staticmethod
+    def parse_bangumi_name(raw_title: str) -> Union[Episode, None]:
         try:
-            ret = self.process(raw)
+            ret = Parser.__process(raw_title)
             if ret is None:
                 return None
             name, season, sr, episode, \
                 sub, dpi, source, ng, group = ret
         except Exception as e:
-            logger.error(f"ERROR match {raw} {e}")
+            logger.error(f"ERROR match {raw_title} {e}")
             return None
         info = Episode()
         info.title = name

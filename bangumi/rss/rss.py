@@ -77,11 +77,10 @@ class RSS(object):
         TODO: 语言优先级的处理
         """
         ret = []
-        parser = Parser()
         seen = defaultdict(lambda: [])
 
         for item in items:
-            info = parser.analyse(item.name)
+            info = Parser.parse_bangumi_name(item.name)
             seen[info.formatted].append((item, info.dpi))
 
         dpi_arr = "720|1080|2160|4K".split("|")

@@ -6,9 +6,9 @@ from bangumi.parser import Parser
 class TestRawParser(unittest.TestCase):
 
     def test_raw_parser(self):
-        parser = Parser()
+
         content = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第二季 Komi-san wa, Komyushou Desu. S02】【22】【GB_MP4】【1920X1080】"
-        info = parser.analyse(content)
+        info = Parser.parse_bangumi_name(content)
 
         self.assertEqual(info.title, "Komi-san wa, Komyushou Desu.")
         self.assertEqual(info.dpi, "1920X1080")
@@ -16,7 +16,7 @@ class TestRawParser(unittest.TestCase):
         self.assertEqual(info.season_info.number, 2)
 
         content = "[百冬练习组&LoliHouse] BanG Dream! 少女乐团派对！☆PICO FEVER！ / Garupa Pico: Fever! - 26 [WebRip 1080p HEVC-10bit AAC][简繁内封字幕][END] [101.69 MB]"
-        info = parser.analyse(content)
+        info = Parser.parse_bangumi_name(content)
 
         self.assertEqual(info.group, "百冬练习组&LoliHouse")
         self.assertEqual(info.title, "BanG Dream! 少女乐团派对！☆PICO FEVER！")
@@ -25,7 +25,7 @@ class TestRawParser(unittest.TestCase):
         self.assertEqual(info.season_info.number, 1)
 
         content = "【喵萌奶茶屋】★04月新番★[夏日重现/Summer Time Rendering][11][1080p][繁日双语][招募翻译] [539.4 MB]"
-        info = parser.analyse(content)
+        info = Parser.parse_bangumi_name(content)
         self.assertEqual(info.group, "喵萌奶茶屋")
         self.assertEqual(info.title, "Summer Time Rendering")
         self.assertEqual(info.dpi, "1080p")
@@ -33,7 +33,7 @@ class TestRawParser(unittest.TestCase):
         self.assertEqual(info.season_info.number, 1)
 
         content = "【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][1080p][繁日双语][招募翻译] [539.4 MB]"
-        info = parser.analyse(content)
+        info = Parser.parse_bangumi_name(content)
         self.assertEqual(info.title, "Summer Time Rendering")
 
     def test_pre_process(self):
@@ -66,15 +66,15 @@ class TestRawParser(unittest.TestCase):
                 self.assertEqual(ret[i], expected[i])
 
     def test_episode(self):
-        parser = Parser()
+
         for epi in range(1, 100000, 100):
             content = f"【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第一季 Komi-san wa, Komyushou Desu. S01】【{epi}】【GB_MP4】【4K】"
-            info = parser.analyse(content)
+            info = Parser.parse_bangumi_name(content)
             self.assertEqual(info.ep_info.number, epi)
 
         for epi in range(1, 100000, 100):
             content = f"[Nekomoe kissaten][Summer Time Rendering - {epi} [1080p][JPTC].mp4"
-            info = parser.analyse(content)
+            info = Parser.parse_bangumi_name(content)
             self.assertEqual(info.ep_info.number, epi)
 
     def test_season(self):
@@ -91,11 +91,11 @@ class TestRawParser(unittest.TestCase):
             "十",
             "十一",
             "十二"]
-        parser = Parser()
+
         for i in range(1, 13):
             season = str(i).zfill(2)
             content = f"【幻樱字幕组】【古见同学有交流障碍症 第{chinese_number_arr[i - 1]}季 Komi-san wa, Komyushou Desu. S{season}】[1]"
-            info = parser.analyse(content)
+            info = Parser.parse_bangumi_name(content)
             self.assertEqual(info.season_info.number, i)
 
     def test_formatted_title(self):
@@ -113,9 +113,9 @@ class TestRawParser(unittest.TestCase):
             ("【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第一季 Komi-san wa, Komyushou Desu. S01】【31】【GB_MP4】【1920X1080】",
              "Komi-san wa, Komyushou Desu. S01E31"),
         ]
-        parser = Parser()
+
         for raw, expected in cases:
-            info = parser.analyse(raw)
+            info = Parser.parse_bangumi_name(raw)
             self.assertEqual(info.formatted, expected)
 
     def test_large_data_set(self):
@@ -323,10 +323,10 @@ class TestRawParser(unittest.TestCase):
             ("【極影字幕社】★4月新番 小書癡的下克上 第三季 第06話 BIG5 1080P MP4（字幕社招人內詳）", "小書癡的下克上", "極影字幕社", 6, 3)
         ]
 
-        parser = Parser()
+
 
         for raw, title, group, epi, season in data:
-            info = parser.analyse(raw)
+            info = Parser.parse_bangumi_name(raw)
             self.assertEqual(info.title, title)
             self.assertEqual(info.group, group)
             self.assertEqual(info.ep_info.number, epi)

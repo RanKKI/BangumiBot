@@ -1,7 +1,6 @@
 import unittest
 
 from bangumi.rss import RSS
-from bangumi.parser import Parser
 from bangumi.entitiy import WaitDownloadItem
 from bangumi.util.files import setup_test_env
 

@@ -1,8 +1,10 @@
 
+from glob import glob
 import logging
 import os
 from time import sleep, time
 
+from pathlib import Path
 
 from bangumi.database import redisDB
 from bangumi.downloader import DownloadState, downloader
@@ -22,7 +24,6 @@ class Bangumi(object):
             # "https://dmhy.org/topics/rss/rss.xml"
             "https://mikanani.me/RSS/MyBangumi?token=2O6Rl47PH1mXSw6v3ACwCA%3d%3d"
         ])
-        self.parser = Parser()
 
     def rename(self, item: DownloadItem, info: WaitDownloadItem) -> bool:
         logger.info(f"Renaming {item.hash} {item.name}...")
@@ -43,7 +44,7 @@ class Bangumi(object):
             logger.error(f"File {file} doesn't exist")
             return False
 
-        result = self.parser.analyse(info.name)
+        result = Parser.parse_bangumi_name(info.name)
         logger.info(f"Renaming {file.name} to {result.formatted}")
         try:
             move_file(file, result)
@@ -82,10 +83,13 @@ class Bangumi(object):
         count = 0
         item = redisDB.pop_torrent_to_download()
         while item:
-            downloader.add_torrent(item.url)
-            logger.info(f"Added {item.url} to downloader")
+            info = Parser.parse_bangumi_name(item.name)
+            if not (info and redisDB.is_downloaded(info.formatted)):
+                redisDB.set_downloaded(info.formatted)
+                downloader.add_torrent(item.url)
+                logger.info(f"Added {item.url} to downloader")
+                count += 1
             item = redisDB.pop_torrent_to_download()
-            count += 1
         if count > 0:
             logger.info("Added %d torrents to downloader", count)
 
@@ -103,14 +107,10 @@ class Bangumi(object):
             sleep(10)
 
     def init(self):
-        pass
-        # media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
-        # for item in media.glob("**/*"):
-        #     if not item.is_file():
-        #         continue
-        #     # get name without ext
-        #     name, _ = os.path.splitext(item.name)
-        #     redisDB.set_downloaded(name)
+        media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
+        for item in glob("**/*", root_dir=media, recursive=True):
+            name, _ = os.path.splitext(item)
+            redisDB.set_downloaded(name)
 
     def run(self):
         logger.info("Starting...")

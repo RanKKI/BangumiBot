@@ -1,3 +1,4 @@
+from hashlib import md5
 import logging
 import os
 from time import time
@@ -58,13 +59,13 @@ class RedisDB(object):
             return None
         return self.get(hash_)
 
-    # def is_downloaded(self, formatted_name: str) -> bool:
-    #     name_hash = md5(formatted_name.encode("utf-8")).hexdigest()
-    #     return self.client.get(f"downloaded:file:{name_hash}")
+    def is_downloaded(self, formatted_name: str) -> bool:
+        name_hash = md5(formatted_name.encode("utf-8")).hexdigest()
+        return self.client.get(f"file:{name_hash}")
 
-    # def set_downloaded(self, formatted_name: str) -> bool:
-    #     name_hash = md5(formatted_name.encode("utf-8")).hexdigest()
-    #     self.client.set(f"downloaded:file:{name_hash}", 1)
+    def set_downloaded(self, formatted_name: str):
+        name_hash = md5(formatted_name.encode("utf-8")).hexdigest()
+        self.client.set(f"file:{name_hash}", 1)
 
     def init(self) -> bool:
         if self.client.get("initd"):

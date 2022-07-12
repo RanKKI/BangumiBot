@@ -14,28 +14,28 @@ class TestRawParser(unittest.TestCase):
         return super().setUp()
 
     def test_output_path(self):
-        parser = Parser()
+
         title = "【喵萌奶茶屋】★04月新番★[夏日重现/Summer Time Rendering][11][1080p][繁日双语][招募翻译] [539.4 MB]"
-        episode = parser.analyse(title)
+        episode = Parser.parse_bangumi_name(title)
         self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Summer Time Rendering/Season 1/Summer Time Rendering S01E11.mp4")
 
         title = "【喵萌奶茶屋】★04月新番★[夏日重现/Summer Time Rendering][12][1080p][繁日双语][招募翻译] [539.4 MB]"
-        episode = parser.analyse(title)
+        episode = Parser.parse_bangumi_name(title)
         self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Summer Time Rendering/Season 1/Summer Time Rendering S01E12.mp4")
 
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第二季 Komi-san wa, Komyushou Desu. S02】【22】【GB_MP4】【1920X1080】"
-        episode = parser.analyse(title)
+        episode = Parser.parse_bangumi_name(title)
         self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu./Season 2/Komi-san wa, Komyushou Desu. S02E22.mp4")
 
 
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第十季 Komi-san wa, Komyushou Desu. S10】【201】【GB_MP4】【1920X1080】"
-        episode = parser.analyse(title)
+        episode = Parser.parse_bangumi_name(title)
         self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu./Season 10/Komi-san wa, Komyushou Desu. S10E201.mp4")
 
     def test_move_file(self):
-        parser = Parser()
+
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第十季 Komi-san wa, Komyushou Desu. S10】【201】【GB_MP4】【1920X1080】"
-        episode = parser.analyse(title)
+        episode = Parser.parse_bangumi_name(title)
 
         val = str(random())
         filename = self.cache_path / Path("test")

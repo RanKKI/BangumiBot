@@ -108,8 +108,14 @@ class Bangumi(object):
     def init(self):
         logger.info("init...")
         media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
-        for item in glob(media / "**/*", recursive=True):
-            name, _ = os.path.splitext(item)
+        exists = set()
+        for item in glob(str(media / "**/*"), recursive=True):
+            if not os.path.isfile(item):
+                continue
+            name, _ = os.path.splitext(os.path.basename(item))
+            exists.add(name)
+        logger.info("Found %d files that already downloaded", len(exists))
+        for name in exists:
             redisDB.set_downloaded(name)
 
     def load_config(self):

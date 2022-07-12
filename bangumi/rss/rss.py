@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import re
@@ -21,9 +22,21 @@ class RSS(object):
             DMHYRSS()
         ]
         self.urls = urls or []
-        self.__rules = [
+        self.rules = [
             # 正则表达式，会过滤结果
         ]
+
+    def load_config(self, config_path: str) -> None:
+        if not os.path.exists(config_path):
+            return
+        with open(config_path, "r") as f:
+            data = json.load(f)
+        self.urls = data.get("urls", [])
+        self.rules = data.get("rules", [])
+        for url in self.urls:
+            logger.info(f"Loaded url: {url}")
+        for rule in self.rules:
+            logger.info(f"Loaded rule: {rule}")
 
     def scrape_url(self, url: str)-> List[WaitDownloadItem]:
         items = []
@@ -34,7 +47,7 @@ class RSS(object):
                     logger.error(f"Failed to scrape {url}")
                 else:
                     items = parser.parse(content)
-        items = self.__filter_by_rules(items)
+        items = self.filter_by_rules(items)
         items = self.filter_by_duplicate(items)
         return items
 
@@ -47,20 +60,20 @@ class RSS(object):
         for url in self.urls:
             items += self.scrape_url(url)
 
-        items = self.__filter_by_time(items, last_scrape_time)
-        items = self.__filter_by_rules(items)
+        items = self.filter_by_time(items, last_scrape_time)
+        items = self.filter_by_rules(items)
         items = self.filter_by_duplicate(items)
         return items
 
-    def __filter_by_time(self, items: List[WaitDownloadItem], last_scrape_time: int) -> List[WaitDownloadItem]:
+    def filter_by_time(self, items: List[WaitDownloadItem], last_scrape_time: int) -> List[WaitDownloadItem]:
         return [item for item in items if item.pub_at > last_scrape_time]
 
-    def __filter_by_rules(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
+    def filter_by_rules(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
         ret = []
 
         for item in items:
             matched = False
-            for rule in self.__rules:
+            for rule in self.rules:
                 if re.match(rule, item.name):
                     matched = True
                     break

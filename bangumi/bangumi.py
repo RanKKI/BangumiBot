@@ -20,10 +20,7 @@ class Bangumi(object):
 
     def __init__(self) -> None:
         super().__init__()
-        self.rss = RSS(urls=[
-            # "https://dmhy.org/topics/rss/rss.xml"
-            "https://mikanani.me/RSS/MyBangumi?token=2O6Rl47PH1mXSw6v3ACwCA%3d%3d"
-        ])
+        self.rss = RSS()
 
     def rename(self, item: DownloadItem, info: WaitDownloadItem) -> bool:
         logger.info(f"Renaming {item.hash} {item.name}...")
@@ -112,10 +109,17 @@ class Bangumi(object):
             name, _ = os.path.splitext(item)
             redisDB.set_downloaded(name)
 
+    def load_config(self):
+        config_folder = Path(os.environ.get(Env.CONFIG_FOLDER.value, "/config"))
+        rss_config = config_folder / "rss.json"
+        if rss_config.exists():
+            self.rss.load_config(rss_config)
+
     def run(self):
         logger.info("Starting...")
         redisDB.connect()
         downloader.connect()
+        self.load_config()
         if redisDB.init():
             self.init()
         self.loop()

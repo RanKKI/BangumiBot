@@ -9,6 +9,7 @@ from pathlib import Path
 from bangumi.database import redisDB
 from bangumi.downloader import DownloadState, downloader
 from bangumi.entitiy import DownloadItem, WaitDownloadItem
+from bangumi.manager import Notification, notification
 from bangumi.parser import Parser
 from bangumi.rss import RSS
 from bangumi.util import Env, move_file, get_relative_path, safe_call
@@ -21,8 +22,9 @@ class Bangumi(object):
     def __init__(self) -> None:
         super().__init__()
         self.rss = RSS()
+        self.notification = Notification()
 
-    def rename(self, item: DownloadItem, info: WaitDownloadItem) -> bool:
+    def rename(self, item: DownloadItem, info: WaitDownloadItem) -> str | bool:
         logger.info(f"Renaming {item.hash} {item.name}...")
         if item.hash != info.hash:
             logger.error(f"Hash mismatch {item.hash} {info.hash}")
@@ -45,7 +47,7 @@ class Bangumi(object):
         logger.info(f"Renaming {file.name} to {result.formatted}")
         try:
             move_file(file, result)
-            return True
+            return result.formatted
         except Exception as e:
             logger.error(f"Failed to rename {e}")
         return False
@@ -56,6 +58,7 @@ class Bangumi(object):
             return
         redisDB.remove(item.hash)
         downloader.remove_torrent(item)
+        self.notification.call(ret)
 
     @safe_call
     def check(self, last_dt: int):
@@ -114,6 +117,9 @@ class Bangumi(object):
         rss_config = config_folder / "rss.json"
         if rss_config.exists():
             self.rss.load_config(rss_config)
+        notification_config = config_folder / "notification.json"
+        if notification_config.exists():
+            self.notification.load_config(notification_config)
 
     def run(self):
         logger.info("Starting...")

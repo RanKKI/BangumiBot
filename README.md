@@ -7,11 +7,6 @@
 
 加上 [EstrellaXD/Auto_Bangumi](https://github.com/EstrellaXD/Auto_Bangumi) 与 qBittorrent 耦合性太强了，于是有重写的想法，其中文本正则处理的代码出自 [EstrellaXD/Auto_Bangumi/auto_bangumi/parser/analyser/raw_parser.py](https://github.com/EstrellaXD/Auto_Bangumi/blob/c9c2b28389aac6ac4d778cdc7de1a77ca024b97e/auto_bangumi/parser/analyser/raw_parser.py)。
 
-## 下载器支持
- - Aria2
- - qBittorrent
- - Transmission
-
 ## Feature
  - RSS
    - [蜜柑计划](https://mikanani.me/)
@@ -19,12 +14,40 @@
  - 去重
    - 已下载番剧不会重复下载
    - 优先下载清晰度高的资源
+ - 下载器
+   - Aria2
+   - qBittorrent
+   - Transmission
+
+## 配置
+
+### RSS
+```
+/config/rss.json
+{
+    "urls": [ // 订阅链接
+      "https://mikanani.me/RSS/MyBangumi?token=<token>"
+    ],
+    "rules": [ // 关键词过滤，正则表达
+      r".*繁体.*"
+    ]
+}
+
+```
+### 通知
+```
+/config/notification.json
+[
+    "https://api.day.app/<you-key-here>/番剧更新！/{title}", # http 通知
+    "/bin/script {title}" # 脚本通知
+]
+```
 
 ## TODO
  - 语言选择的优先级
  - Docker
  - 保种
- - 更新提示（可以通过 iOS 的 bear）
+ - ~~更新提示~~
  - ~~Transmission 支持~~
  - ~~RSS 配置~~
  - ~~RSS 自定义过滤规则的配置~~

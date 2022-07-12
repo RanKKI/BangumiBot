@@ -110,7 +110,7 @@ class Bangumi(object):
             redisDB.set_downloaded(name)
 
     def load_config(self):
-        config_folder = Path(os.environ.get(Env.CONFIG_FOLDER.value, "/config"))
+        config_folder = Path(os.environ.get(Env.CONFIG_PATH.value, "/config"))
         rss_config = config_folder / "rss.json"
         if rss_config.exists():
             self.rss.load_config(rss_config)

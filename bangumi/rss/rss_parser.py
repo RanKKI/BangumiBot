@@ -6,16 +6,9 @@ from typing import List
 import bs4
 import requests
 
+from bangumi.entitiy import WaitDownloadItem
+
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class RSSItem:
-    name: str
-    url: str
-    publish_at: int
-    hash: str
-
 
 class RSSParser(ABC):
 
@@ -30,5 +23,5 @@ class RSSParser(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def parse(self, content) -> List[RSSItem]:
+    def parse(self, content) -> List[WaitDownloadItem]:
         raise NotImplementedError()

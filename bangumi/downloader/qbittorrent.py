@@ -1,11 +1,12 @@
-from functools import wraps
-from http import HTTPStatus
 import logging
+from functools import wraps
+from pathlib import Path
 from typing import Any, List
 
-from qbittorrentapi import Client, LoginFailed, APIConnectionError
+from bangumi.entitiy import DownloadItem
+from qbittorrentapi import APIConnectionError, Client, LoginFailed
 
-from .downloader import Downloader, DownloadItem, DownloadState
+from .downloader import Downloader, DownloadState
 
 logger = logging.getLogger(__name__)
 
@@ -70,25 +71,42 @@ class QBittorrentDownloader(Downloader):
 
     @handle_api_error(False)
     def remove_torrent(self, item: DownloadItem) -> bool:
-        self.client.torrents_delete(hashes=[item.id])
+        self.client.torrents_delete(hashes=[item.hash])
 
     @handle_api_error(lambda : [])
-    def get_downloads(self, state: DownloadState = DownloadState.NONE) -> List[DownloadItem]:
+    def get_downloads(self, state: int = DownloadState.NONE) -> List[DownloadItem]:
         resp = self.client.torrents_info()
 
-        ret = []
-        for item in resp:
-            if state == DownloadState.FINISHED and item['amount_left'] <= 0:
-                ret.append(item)
+        """
+
+        all, downloading, completed, paused, active, inactive, resumed, stalled, stalled_uploading and stalled_downloading
+
+        """
 
         def wrapper(item):
             hash = item['hash']
             resp = self.client.torrents_files(torrent_hash=hash)
-            files = [x["name"] for x in resp]
+            files = [Path(x["name"]) for x in resp]
             return DownloadItem(
-                id=hash,
+                hash=hash,
                 name=item['name'],
                 files=files
             )
 
-        return list(filter(lambda x: x, map(wrapper, ret)))
+        if state == DownloadState.NONE:
+            return list(map(wrapper, resp))
+
+        ret = []
+        for item in resp:
+            add = False
+            if state & DownloadState.FINISHED and (item['state'] == 'completed' or item['amount_left'] <= 0):
+                add = True
+            if state & DownloadState.DOWNLOADING and item['state'] == 'downloading':
+                add = True
+            if state & DownloadState.PAUSED and item['state'] == 'paused':
+                add = True
+
+            if add:
+                ret.append(item)
+
+        return list(map(wrapper, ret))

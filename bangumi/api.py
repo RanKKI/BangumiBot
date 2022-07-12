@@ -7,9 +7,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from bangumi.database import redisDB
-from bangumi.downloader import Downloader, build_downloader
-from bangumi.rss.rss import RSS
-from bangumi.rss.rss_parser import RSSItem
+from bangumi.entitiy import WaitDownloadItem
+from bangumi.rss import RSS
 from bangumi.util import setup_env
 
 logger = logging.getLogger(__name__)
@@ -17,55 +16,30 @@ logger = logging.getLogger(__name__)
 class AddTorrent(BaseModel):
     name: str
     url: str
-    hash: str
-
-
-app = FastAPI()
-downloader: Downloader
-
-@app.post("/add_torrent")
-async def read_item(info: AddTorrent):
-    downloader.add_torrent(info.url)
-    redisDB.set(info.hash, RSSItem(
-        name=info.name,
-        url=info.url,
-        hash=info.hash,
-        publish_at=0
-    ))
-    return {"message": "OK!"}
-
-@app.post("/add_torrents")
-async def read_item(infos: List[AddTorrent]):
-    for info in infos:
-        downloader.add_torrent(info.url)
-        redisDB.set(info.hash, RSSItem(
-            name=info.name,
-            url=info.url,
-            hash=info.hash,
-            publish_at=0
-        ))
-    return {"message": "OK!"}
-
 
 class AddRss(BaseModel):
     url: str
 
-@app.post("/add_by_rss")
-async def read_item(r: AddRss):
-    for item in RSS().scrape_url(r.url):
-        downloader.add_torrent(item.url)
-        redisDB.set(item.hash, RSSItem(
-            name=item.name,
-            url=item.url,
-            hash=item.hash,
-            publish_at=item.publish_at
-        ))
+app = FastAPI()
+
+@app.post("/add_torrent")
+async def add_torrent(item: AddTorrent):
+    print(item)
+    redisDB.add_to_torrent_queue(WaitDownloadItem(item.name, item.url))
     return {"message": "OK!"}
 
-if not os.environ.get("TEST_ENV") and not sys.argv[0] == "main.py":
-    """
-    GitHub CI/CD 中不执行
-    """
+@app.post("/add_torrents")
+async def add_torrents(items: List[AddTorrent]):
+    redisDB.add_to_torrent_queue([WaitDownloadItem(item.name, item.url) for item in items])
+    return {"message": "OK!"}
+
+@app.post("/add_by_rss")
+async def add_torrents_by_rss(r: AddRss):
+    items = await RSS().scrape_url(r.url)
+    redisDB.add_to_torrent_queue(items)
+    return {"message": "OK!", "count": items}
+
+@app.on_event("startup")
+def startup():
     setup_env()
-    downloader = build_downloader()
     redisDB.connect()

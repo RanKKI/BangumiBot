@@ -1,10 +1,10 @@
 import os
-
-from bangumi.util.const import Env
+from bangumi.consts.env import Env
+from bangumi.util import setup_env
 
 from .aria2 import Aria2Downloader
+from .downloader import Downloader, DownloadState
 from .qbittorrent import QBittorrentDownloader
-from .downloader import Downloader, DownloadItem, DownloadState
 
 
 def build_downloader() -> Downloader:
@@ -29,3 +29,9 @@ def build_downloader() -> Downloader:
             password=password
         )
     raise ValueError("Client type not specified")
+
+downloader: Downloader = None
+
+if not os.environ.get("TEST_ENV"):
+    setup_env()
+    downloader = build_downloader()

@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 from bangumi.entitiy.episode import Episode
-from bangumi.util.const import Env
+from bangumi.consts.env import Env
 
 def get_relative_path(path: Path) -> Path:
     """

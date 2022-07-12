@@ -1,1 +1,1 @@
-from .rss import RSS, RSSItem
+from .rss import RSS

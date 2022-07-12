@@ -1,15 +1,17 @@
+import logging
 import os
 import re
 from collections import defaultdict
 from typing import List
 
+from bangumi.entitiy.wait_download_item import WaitDownloadItem
 from bangumi.parser import Parser
-from loguru import logger
 
 from .dmhy import DMHYRSS
 from .mikan import MiKanRSS
-from .rss_parser import RSSItem, RSSParser
+from .rss_parser import RSSParser
 
+logger = logging.getLogger(__name__)
 
 class RSS(object):
 
@@ -23,7 +25,7 @@ class RSS(object):
             # 正则表达式，会过滤结果
         ]
 
-    def scrape_url(self, url: str)-> List[RSSItem]:
+    def scrape_url(self, url: str)-> List[WaitDownloadItem]:
         items = []
         for parser in self.__parsers:
             if parser.is_matched(url):
@@ -34,10 +36,9 @@ class RSS(object):
                     items = parser.parse(content)
         items = self.__filter_by_rules(items)
         items = self.filter_by_duplicate(items)
-        items = self.filter_exists(items)
         return items
 
-    def scrape(self, last_scrape_time: int) -> List[RSSItem]:
+    def scrape(self, last_scrape_time: int) -> List[WaitDownloadItem]:
         """
         在主循环中调用此方法，获取 RSS 数据
         """
@@ -49,14 +50,12 @@ class RSS(object):
         items = self.__filter_by_time(items, last_scrape_time)
         items = self.__filter_by_rules(items)
         items = self.filter_by_duplicate(items)
-        items = self.filter_exists(items)
-
         return items
 
-    def __filter_by_time(self, items: List[RSSItem], last_scrape_time: int) -> List[RSSItem]:
-        return [item for item in items if item.publish_at > last_scrape_time]
+    def __filter_by_time(self, items: List[WaitDownloadItem], last_scrape_time: int) -> List[WaitDownloadItem]:
+        return [item for item in items if item.pub_at > last_scrape_time]
 
-    def __filter_by_rules(self, items: List[RSSItem]) -> List[RSSItem]:
+    def __filter_by_rules(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
         ret = []
 
         for item in items:
@@ -70,7 +69,7 @@ class RSS(object):
 
         return ret
 
-    def filter_by_duplicate(self, items: List[RSSItem]) -> List[RSSItem]:
+    def filter_by_duplicate(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
         """
         对重复的 RSS 数据进行过滤
         根据分辨率选择最高清的
@@ -100,26 +99,4 @@ class RSS(object):
             val = sorted(val, key=lambda x:get_dpi_idx(x[1]))
             ret.append(val[0][0])
 
-        return ret
-
-    def filter_exists(self, items: List[RSSItem]) -> List[RSSItem]:
-        """
-        对已经存在（本地）的 RSS 数据进行过滤
-        避免重复抓取
-        """
-        ret = []
-        parser = Parser()
-        for item in items:
-            info = parser.analyse(item.name)
-            path = info.get_full_path()
-            exists = False
-            for file in path.parent.glob("*"):
-                if not file.is_file():
-                    continue
-                file_name, _ = os.path.splitext(file.name)
-                if file_name == path.name:
-                    exists = True
-                    break
-            if not exists:
-                ret.append(item)
         return ret

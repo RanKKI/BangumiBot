@@ -1,12 +1,11 @@
-from functools import wraps
-import json
 import logging
+from functools import wraps
 from typing import Any, List
 
-from aria2p import API, Client, Download, ClientException
+from aria2p import API, Client, ClientException, Download
+from bangumi.entitiy import DownloadItem
 
-from .downloader import Downloader, DownloadItem, DownloadState
-
+from .downloader import Downloader, DownloadState
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ class Aria2Downloader(Downloader):
     def __wrap_aria2_item(self, item: Download) -> DownloadItem:
         files = [x.path for x in item.files]
         return DownloadItem(
-            id=item.info_hash,
+            hash=item.info_hash,
             name=item.name,
             files=files
         )
@@ -82,7 +81,7 @@ class Aria2Downloader(Downloader):
     def remove_torrent(self, item: DownloadItem) -> bool:
         downloads = self.client.get_downloads()
 
-        targets = [download for download in downloads if download.info_hash == item.id]
+        targets = [download for download in downloads if download.info_hash == item.hash]
 
         if len(targets) == 0:
             return False
@@ -93,7 +92,7 @@ class Aria2Downloader(Downloader):
         return all(self.client.remove(targets, force=True, clean=True))
 
     @handle_api_error(lambda: [])
-    def get_downloads(self, state: DownloadState = ...) -> List[DownloadItem]:
+    def get_downloads(self, state: int = ...) -> List[DownloadItem]:
         downloads = self.client.get_downloads()
 
         if state == DownloadState.NONE:
@@ -103,15 +102,18 @@ class Aria2Downloader(Downloader):
 
         for download in downloads:
             add = False
-            if state == DownloadState.DOWNLOADING:
+            if state & DownloadState.DOWNLOADING:
                 if download.status == "active" and download.completed_length < download.total_length:
                     add = True
-            elif state == DownloadState.FINISHED:
+
+            if state & DownloadState.FINISHED:
+
                 if download.status == "complete":
                     add = True
                 if download.status == "active" and download.completed_length == download.total_length:
                     add = True
-            elif state == DownloadState.ERROR and download.status == "error":
+
+            if state & DownloadState.ERROR and download.status == "error":
                 add = True
 
             if add:

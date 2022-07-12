@@ -1,9 +1,9 @@
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 from pathlib import Path
-from turtle import st
 
-from bangumi.util.const import Env
+from bangumi.consts.env import Env
+
 
 @dataclass
 class TitleInfo:

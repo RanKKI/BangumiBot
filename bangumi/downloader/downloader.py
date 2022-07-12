@@ -3,35 +3,22 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
 from hashlib import md5
 from pathlib import Path
 from typing import Callable, List
 
 import requests
-from bangumi.util.const import Env
+from bangumi.consts.env import Env
+from bangumi.entitiy import DownloadItem
 
 logger = logging.getLogger(__name__)
 
-
-@dataclass
-class DownloadItem:
-    id: str  # torrent hash
-    name: str
-    files: List[Path]
-
-    def __eq__(self, other):
-        if not isinstance(other, DownloadItem):
-            raise TypeError("Can't compare DownloadItem with {}".format(type(other)))
-        return self.id == other.id
-
-
-class DownloadState(Enum):
-    NONE = 0
-    DOWNLOADING = 1
-    PAUSED = 2
-    FINISHED = 3
-    ERROR = 4
+class DownloadState:
+    NONE = 1 << 0
+    DOWNLOADING = 1 << 1
+    PAUSED = 1 << 2
+    FINISHED = 1 << 3
+    ERROR = 1 << 4
 
 
 TorrentFinishedCB = Callable[[DownloadItem], None]
@@ -41,8 +28,7 @@ class Downloader(ABC):
 
     def __init__(self):
         self.on_torrent_finished_callback: TorrentFinishedCB = None
-        self.cache_folder = Path(
-            os.environ.get(Env.CACHE_FOLDER.value, ".cache"))
+        self.cache_folder = Path(os.environ.get(Env.CACHE_FOLDER.value, ".cache"))
 
     def add_torrent(self, url_or_magnet: str) -> bool:
         logger.debug(f"Adding torrent {url_or_magnet}")
@@ -51,7 +37,8 @@ class Downloader(ABC):
         if url_or_magnet.startswith("http"):
             return self.add_torrent_by_url(url_or_magnet)
 
-        raise ValueError("Invalid url or magnet: {}".format(url_or_magnet))
+        logger.error(f"Invalid url or magnet: {url_or_magnet}")
+        return False
 
     def add_torrent_by_url(self, url: str) -> bool:
         file_data = requests.get(url)
@@ -82,5 +69,5 @@ class Downloader(ABC):
     @abstractmethod
     def get_downloads(
             self,
-            state: DownloadState = DownloadState.NONE) -> List[DownloadItem]:
+            state: int = DownloadState.NONE) -> List[DownloadItem]:
         raise NotImplementedError()

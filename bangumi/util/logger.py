@@ -1,7 +1,8 @@
 import logging
 
-from .const import Env
 import os
+
+from bangumi.consts.env import Env
 
 
 def setup_logger():

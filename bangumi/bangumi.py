@@ -108,7 +108,7 @@ class Bangumi(object):
 
     def init(self):
         media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
-        for item in glob("**/*", root_dir=media, recursive=True):
+        for item in glob(media / "**/*", recursive=True):
             name, _ = os.path.splitext(item)
             redisDB.set_downloaded(name)
 

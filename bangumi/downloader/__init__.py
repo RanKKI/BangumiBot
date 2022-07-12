@@ -5,6 +5,7 @@ from bangumi.util import setup_env
 from .aria2 import Aria2Downloader
 from .downloader import Downloader, DownloadState
 from .qbittorrent import QBittorrentDownloader
+from .transmission import TransmissionDownloader
 
 
 def build_downloader() -> Downloader:
@@ -23,6 +24,13 @@ def build_downloader() -> Downloader:
         )
     elif client_type == "qbittorrent" or client_type == "qb":
         return QBittorrentDownloader(
+            host=host,
+            port=port,
+            username=username,
+            password=password
+        )
+    elif client_type == "transmission":
+        return TransmissionDownloader(
             host=host,
             port=port,
             username=username,

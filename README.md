@@ -10,6 +10,7 @@
 ## 下载器支持
  - Aria2
  - qBittorrent
+ - Transmission
 
 ## Feature
  - RSS
@@ -20,10 +21,10 @@
    - 优先下载清晰度高的资源
 
 ## TODO
- - Transmission 支持
  - 语言选择的优先级
  - Docker
  - 保种
- - RSS 配置
- - RSS 自定义过滤规则的配置
  - 更新提示（可以通过 iOS 的 bear）
+ - ~~Transmission 支持~~
+ - ~~RSS 配置~~
+ - ~~RSS 自定义过滤规则的配置~~

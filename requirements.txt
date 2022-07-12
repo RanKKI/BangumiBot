@@ -28,6 +28,7 @@ sniffio==1.2.0
 soupsieve==2.3.2.post1
 starlette==0.19.1
 toml==0.10.2
+transmission-rpc==3.3.2
 typing_extensions==4.3.0
 urllib3==1.26.10
 uvicorn==0.18.2

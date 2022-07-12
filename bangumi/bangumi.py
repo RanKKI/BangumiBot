@@ -24,24 +24,24 @@ class Bangumi(object):
         self.rss = RSS()
         self.notification = Notification()
 
-    def rename(self, item: DownloadItem, info: WaitDownloadItem) -> str | bool:
+    def rename(self, item: DownloadItem, info: WaitDownloadItem) -> str:
         logger.info(f"Renaming {item.hash} {item.name}...")
         if item.hash != info.hash:
             logger.error(f"Hash mismatch {item.hash} {info.hash}")
-            return False
+            return
         if len(item.files) > 1:
             logger.error(f"Can't rename multi-file torrent {item.hash}")
-            return False
+            return
         if len(item.files) == 0:
             logger.error(f"Can't rename empty torrent {item.hash}")
-            return False
+            return
 
         file = item.files[0]
         file = get_relative_path(file)
 
         if not file.exists():
             logger.error(f"File {file} doesn't exist")
-            return False
+            return
 
         result = Parser.parse_bangumi_name(info.name)
         logger.info(f"Renaming {file.name} to {result.formatted}")
@@ -50,7 +50,6 @@ class Bangumi(object):
             return result.formatted
         except Exception as e:
             logger.error(f"Failed to rename {e}")
-        return False
 
     def on_torrent_finished(self, item: DownloadItem):
         ret = self.rename(item, redisDB.get(item.hash))

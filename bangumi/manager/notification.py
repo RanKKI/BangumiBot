@@ -1,8 +1,10 @@
 
 import json
+import logging
 import os
 from typing import List
 
+logger = logging.getLogger(__name__)
 
 class Notification(object):
 
@@ -17,6 +19,7 @@ class Notification(object):
         self.callbacks = data
 
     def call(self, title: str):
+        logger.info(f"Send notification: {title}")
         for callback in self.callbacks:
             self.__call(callback.format(title=title))
 
@@ -27,7 +30,7 @@ class Notification(object):
             self.__call_script(callback)
 
     def __call_http(self, url: str):
-        os.system(f"curl -X GET {url}")
+        os.system(f"curl -X GET '{url}'")
 
     def __call_script(self, script: str):
         os.system(script)

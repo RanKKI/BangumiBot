@@ -19,8 +19,17 @@
    - qBittorrent
    - Transmission
 
-## 配置
+## 使用指南
 
+ - 复制 .env.example 到 .env
+ - 设置下载器地址，用户名，密码
+ - 设置 Redis 服务地址
+ - 设置 RSS 更新频率
+ - 复制文件夹 ./config 到 ./.config
+ - 修改[订阅](#rss)配置文件 `./.config/rss.json `
+ - 修改[通知](#通知)配置文件 `./.config/notification.json`
+
+## 配置
 ### RSS
 ```
 /config/rss.json
@@ -29,7 +38,8 @@
       "https://mikanani.me/RSS/MyBangumi?token=<token>"
     ],
     "rules": [ // 关键词过滤，正则表达
-      r".*繁体.*"
+      r".*繁体.*",
+      r"^另一个过滤"
     ]
 }
 

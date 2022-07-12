@@ -106,6 +106,7 @@ class Bangumi(object):
             sleep(10)
 
     def init(self):
+        logger.info("init...")
         media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
         for item in glob(media / "**/*", recursive=True):
             name, _ = os.path.splitext(item)

@@ -16,7 +16,7 @@ def move_file(file: Path, result: Episode) -> None:
     ext = os.path.splitext(file.name)[1]
     target_file = result.get_full_path(ext=ext)
     target_file.parent.mkdir(parents=True, exist_ok=True)
-    file.rename(target_file)
+    shutil.move(file, target_file)
 
 def setup_test_env() -> Path:
     """

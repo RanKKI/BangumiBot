@@ -122,7 +122,7 @@ docker compose up
 /config/notification.json
 [
     "https://api.day.app/<you-key-here>/番剧更新！/{title}", # http 通知
-    "/bin/script {title}" # 脚本通知
+    "/bin/script" # 脚本通知, 第一个参数为 {title}
 ]
 ```
 

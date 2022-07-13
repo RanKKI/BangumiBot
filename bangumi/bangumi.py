@@ -6,6 +6,8 @@ from time import sleep, time
 
 from pathlib import Path
 
+import requests
+
 from bangumi.database import redisDB
 from bangumi.downloader import DownloadState, downloader
 from bangumi.entitiy import DownloadItem, WaitDownloadItem
@@ -69,7 +71,12 @@ class Bangumi(object):
     @safe_call
     def check_complete(self):
         logger.debug("Checking complete...")
-        completed = downloader.get_downloads(DownloadState.FINISHED)
+        try:
+            completed = downloader.get_downloads(DownloadState.FINISHED)
+        except requests.exceptions.ConnectionError:
+            logger.error("Failed to get completed torrents")
+            return
+
         if len(completed) == 0:
             return
         logger.info("Found %d completed downloads", len(completed))

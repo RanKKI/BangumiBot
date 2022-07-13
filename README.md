@@ -25,9 +25,67 @@
  - 设置下载器地址，用户名，密码
  - 设置 Redis 服务地址
  - 设置 RSS 更新频率
- - 复制文件夹 ./config 到 ./.config
- - 修改[订阅](#rss)配置文件 `./.config/rss.json `
- - 修改[通知](#通知)配置文件 `./.config/notification.json`
+ - 复制文件夹 ./config_example 到 ./config
+ - 修改[订阅](#rss)配置文件 `./config/rss.json `
+ - 修改[通知](#通知)配置文件 `./config/notification.json`
+
+## Docker
+
+```
+docker network create --subnet=172.18.0.0/16 bangumi_network # 建立一个网络
+
+docker run --name redis -p 6379:6379 \
+  --net bangumi_network \
+  --ip 172.18.0.20 \
+  -d redis # 启一个 Redis 实例并加入网络
+
+docker run -d \
+  --name aria2 --restart unless-stopped --log-opt max-size=1m \
+  --net bangumi_network \
+  -e PUID=$UID -e PGID=$GID -e UMASK_SET=022 \
+  -e RPC_PORT=6800 -p 6800:6800 \
+  -e LISTEN_PORT=6888 \
+  -e RPC_SECRET="bangumi_aria2" \
+  -p 6888:6888 -p 6888:6888/udp \
+  -v ${pwd}/.cache/aria2-config:/config \
+  -v ${pwd}/.cache/aria2-downloads:/downloads \
+  --ip 172.18.0.21 \
+  p3terx/aria2-pro # 启一个 Aria2 实例并加入网络
+
+docker run --name bangumi \
+  -e BANGUMI_CHECK_INTERVAL=600 \
+  -e BANGUMI_CLIENT_TYPE="aria2" \
+  -e BANGUMI_CLIENT_IP="172.18.0.21" \
+  -e BANGUMI_CLIENT_PORT="6800" \
+  -e BANGUMI_CLIENT_USERNAME="" \
+  -e BANGUMI_CLIENT_PASSWORD="bangumi_aria2" \
+  -e BANGUMI_REDIS_HOST="172.18.0.20" \
+  -e BANGUMI_REDIS_PORT="6379" \
+  -e BANGUMI_REDIS_PASSWORD="" \
+  --ip 172.18.0.22 \
+  -v /path/to/media:/media \
+  -v /path/to/downloads:/downloads \
+  -v /path/to/config:/config \
+  --net bangumi_network -d \
+  rankki/bangumi:latest
+```
+
+### Docker Compose
+
+一键启动 Redis, Aria2 和本项目
+
+注意，不带 Aria2 Web UI, 如果有需要可以使用 [ziahamza/webui-aria2](https://github.com/ziahamza/webui-aria2)
+
+```
+export BANGUMI_ROOT=${PWD}
+export DOWNLOAD_PATH=${BANGUMI_ROOT}/.cache/downloads
+export BANGUMI_CONFIG=${BANGUMI_ROOT}/.cache/bangumi-config
+export MEDIA_PATH=${BANGUMI_ROOT}/.cache/media
+export ARIA2_CONFIG=${BANGUMI_ROOT}/.cache/aria2-config
+
+docker compose up
+docker-compose up
+```
 
 ## 配置
 ### RSS

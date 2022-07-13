@@ -1,0 +1,72 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    networks:
+      auto_bangumi:
+        ipv4_address: 10.1.0.20
+
+  aria2:
+    container_name: aria2
+    image: p3terx/aria2-pro:latest
+    restart: unless-stopped
+    environment:
+      - PUID=${UID}
+      - PGID=${GID}
+      - UMASK_SET=022
+      - RPC_PORT=6800
+      - LISTEN_PORT=6888
+      - RPC_SECRET=bangumi_aria2
+    ports:
+      - 6800:6800
+      - 6888:6888
+      - 6888:6888/udp
+    networks:
+      auto_bangumi:
+        ipv4_address: 10.1.0.21
+    logging:
+      options:
+        max-size: "10m"
+    volumes:
+      - ${DOWNLOAD_PATH}:/downloads
+      - ${ARIA2_CONFIG}:/config
+
+  bangumi:
+    container_name: bangumi
+    image: rankki/bangumi:latest
+    restart: unless-stopped
+    environment:
+      - BANGUMI_CHECK_INTERVAL=600
+      - BANGUMI_CLIENT_TYPE=aria2
+      - BANGUMI_CLIENT_IP=10.1.0.21
+      - BANGUMI_CLIENT_PORT=6800
+      - BANGUMI_CLIENT_USERNAME=
+      - BANGUMI_CLIENT_PASSWORD=bangumi_aria2
+      - BANGUMI_REDIS_HOST=10.1.0.20
+      - BANGUMI_REDIS_PORT=6379
+      - BANGUMI_REDIS_PASSWORD=
+    ports:
+      - 8000:8000
+    networks:
+      auto_bangumi:
+        ipv4_address: 10.1.0.22
+    depends_on:
+      - redis
+      - aria2
+    logging:
+      options:
+        max-size: "10m"
+    volumes:
+      - ${DOWNLOAD_PATH}:/downloads
+      - ${BANGUMI_CONFIG}:/config
+      - ${MEDIA_PATH}:/media
+
+networks:
+  auto_bangumi:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.1.0.0/24

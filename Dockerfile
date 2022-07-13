@@ -7,13 +7,13 @@ COPY . .
 RUN pip install -r requirements.txt
 
 # NO NEED EDIT
-ENV BANGUMI_CACHE_FOLDER = "/cache"
+ENV BANGUMI_CACHE_FOLDER "/cache"
 
 # DO NOT EDIT
 # USER NEEDS MOUNT TO THESE DIRECTORY
-ENV BANGUMI_DOWNLOAD_FOLDER = "/downloads"
-ENV BANGUMI_MEDIA_FOLDER = "/media"
-ENV BANGUMI_CONFIG_PATH = "/config"
+ENV BANGUMI_DOWNLOAD_FOLDER "/downloads"
+ENV BANGUMI_MEDIA_FOLDER "/media"
+ENV BANGUMI_CONFIG_PATH "/config"
 
 # MAIN ENTRY
 RUN echo "#!/bin/bash" > ./start.sh

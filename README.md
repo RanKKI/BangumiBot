@@ -66,9 +66,10 @@ docker run --name bangumi \
   -e BANGUMI_REDIS_PORT="6379" \
   -e BANGUMI_REDIS_PASSWORD="" \
   --ip 10.1.0.22 \
-  -v /path/to/media:/media \
-  -v /path/to/downloads:/downloads \
-  -v /path/to/config:/config \
+  -p 8000:8000 \
+  -v /media:/media \
+  -v /downloads:/downloads \
+  -v /config:/config \
   --net bangumi_network -d \
   rankki/bangumi:latest
 ```

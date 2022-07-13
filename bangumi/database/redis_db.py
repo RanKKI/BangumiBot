@@ -63,16 +63,20 @@ class RedisDB(object):
     def get_key_from_formatted_name(self, name: str) -> str:
         ret = re.match(r"(.*) (S\d+E\d+)", name.strip())
         if not ret:
-            raise ValueError(f"Invalid formatted name: {name}")
+            return
         name, ext = ret.groups()
         return name.strip().replace(" ", "_") + ":" + ext
 
     def is_downloaded(self, formatted_name: str) -> bool:
         key = self.get_key_from_formatted_name(formatted_name)
+        if not key:
+            return False
         return self.client.get(f"file:{key}")
 
     def set_downloaded(self, formatted_name: str):
         key = self.get_key_from_formatted_name(formatted_name)
+        if not key:
+            return
         self.client.set(f"file:{key}", 1)
 
     def init(self) -> bool:

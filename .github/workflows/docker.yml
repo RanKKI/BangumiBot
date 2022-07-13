@@ -3,17 +3,13 @@ name: Build & Publish Docker Image
 on:
   push:
     tags:
-      - '*'
+      - 'v*.*.*'
 
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Set env
-        run: |
-          export version_tag=${GITHUB_REF#refs/*/}
-          echo "RELEASE_VERSION=`echo $version_tag | tr -d 'v'`" >> $GITHUB_ENV
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -27,8 +23,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
+          pull: true
           push: true
-          tags: user/app:latest
+          tags: rankki/bangumi:latest
+          context: .
+          platforms: linux/amd64,linux/arm64

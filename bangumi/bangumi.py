@@ -90,11 +90,14 @@ class Bangumi(object):
         item = redisDB.pop_torrent_to_download()
         while item:
             info = Parser.parse_bangumi_name(item.name)
-            if not (info and redisDB.is_downloaded(info.formatted)):
-                redisDB.set_downloaded(info.formatted)
-                downloader.add_torrent(item.url)
-                logger.info(f"Added {item.url} to downloader")
-                count += 1
+            try:
+                if not (info and redisDB.is_downloaded(info.formatted)):
+                    redisDB.set_downloaded(info.formatted)
+                    downloader.add_torrent(item.url)
+                    logger.info(f"Added {item.url} to downloader")
+                    count += 1
+            except ValueError as e:
+                logger.error(f"Failed to parse {item.name} {e}")
             item = redisDB.pop_torrent_to_download()
         if count > 0:
             logger.info("Added %d torrents to downloader", count)

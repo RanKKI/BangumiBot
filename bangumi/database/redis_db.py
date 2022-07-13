@@ -1,6 +1,7 @@
 from hashlib import md5
 import logging
 import os
+import re
 from time import time
 from typing import List, Union
 
@@ -59,13 +60,20 @@ class RedisDB(object):
             return None
         return self.get(hash_)
 
+    def get_key_from_formatted_name(self, name: str) -> str:
+        ret = re.match(r"(.*) (S\d+E\d+)", name.strip())
+        if not ret:
+            raise ValueError(f"Invalid formatted name: {name}")
+        name, ext = ret.groups()
+        return name.strip().replace(" ", "_") + ":" + ext
+
     def is_downloaded(self, formatted_name: str) -> bool:
-        name_hash = md5(formatted_name.encode("utf-8")).hexdigest()
-        return self.client.get(f"file:{name_hash}")
+        key = self.get_key_from_formatted_name(formatted_name)
+        return self.client.get(f"file:{key}")
 
     def set_downloaded(self, formatted_name: str):
-        name_hash = md5(formatted_name.encode("utf-8")).hexdigest()
-        self.client.set(f"file:{name_hash}", 1)
+        key = self.get_key_from_formatted_name(formatted_name)
+        self.client.set(f"file:{key}", 1)
 
     def init(self) -> bool:
         if self.client.get("initd"):

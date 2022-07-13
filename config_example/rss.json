@@ -1,4 +1,13 @@
 {
     "urls": [],
-    "rules": []
+    "rules": [],
+    "parsers": [
+        {
+            "folder": "/path/to/plugins",
+            "classes": [
+                "your-parser-name",
+                "another-parser-name"
+            ]
+        }
+    ]
 }

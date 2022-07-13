@@ -16,7 +16,8 @@
 *_LOCAL_*.txt
 *_REMOTE_*.txt
 
-.config
+.config/
+config/
 
 ### macOS ###
 # General

@@ -7,10 +7,13 @@
 
 加上 [EstrellaXD/Auto_Bangumi](https://github.com/EstrellaXD/Auto_Bangumi) 与 qBittorrent 耦合性太强了，于是有重写的想法，其中文本正则处理的代码出自 [EstrellaXD/Auto_Bangumi/auto_bangumi/parser/analyser/raw_parser.py](https://github.com/EstrellaXD/Auto_Bangumi/blob/c9c2b28389aac6ac4d778cdc7de1a77ca024b97e/auto_bangumi/parser/analyser/raw_parser.py)。
 
+提供高自定义操作，可以自己写插件支持本项目不支持的 RSS 站点，甚至支持非 RSS 站点
+
 ## Feature
  - RSS
    - [蜜柑计划](https://mikanani.me/)
    - [动漫花园](https://dmhy.org/)
+   - 自定义插件
  - 去重
    - 已下载番剧不会重复下载
    - 优先下载清晰度高的资源
@@ -98,6 +101,15 @@ docker-compose up
     "rules": [ // 关键词过滤，正则表达
       r".*繁体.*",
       r"^另一个过滤"
+    ],
+    "parsers": [
+        {
+            "folder": "/path/to/plugins", # 插件的绝对路径，要求是一个 module，并 import 类到 `__init__.py`
+            "classes": [
+                "your-parser-name", # 插件类的名字
+                "another-parser-name"
+            ]
+        }
     ]
 }
 
@@ -113,7 +125,7 @@ docker-compose up
 
 ## TODO
  - 语言选择的优先级
- - Docker
+ - ~~Docker~~
  - 保种
  - ~~更新提示~~
  - ~~Transmission 支持~~

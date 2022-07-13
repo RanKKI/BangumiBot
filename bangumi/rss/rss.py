@@ -1,12 +1,16 @@
+import inspect
 import json
 import logging
 import os
+from pathlib import Path
 import re
 from collections import defaultdict
-from typing import List
+from typing import Dict, List, Union
 
 from bangumi.entitiy.wait_download_item import WaitDownloadItem
 from bangumi.parser import Parser
+from bangumi.util.data_class import from_dict_to_dataclass
+from bangumi.util.plugin import dynamic_get_class
 
 from .dmhy import DMHYRSS
 from .mikan import MiKanRSS
@@ -33,10 +37,35 @@ class RSS(object):
             data = json.load(f)
         self.urls = data.get("urls", [])
         self.rules = data.get("rules", [])
-        for url in self.urls:
-            logger.info(f"Loaded url: {url}")
         for rule in self.rules:
             logger.info(f"Loaded rule: {rule}")
+        for parser in data.get("parsers", []):
+            self.__load_parser(parser)
+
+        self.__validate_parser()
+
+    def __load_parser(self, parser: Dict[str, Union[str, List[str]]]) -> None:
+        folder = parser.get("folder", None)
+        if not folder:
+            return
+        classes = parser.get("classes", [])
+        logger.info(f"Loading parser plugin {folder} {classes}")
+        clz_objects = dynamic_get_class(Path(folder), classes)
+        self.__parsers.extend([clz() for clz in clz_objects])
+
+    def __validate_parser(self):
+        for url in self.urls:
+            matched = False
+            for parser in self.__parsers:
+                if parser.is_matched(url):
+                    matched = True
+                    break
+            if not matched:
+                logger.error(f"Failed to match url: {url}")
+                self.urls.remove(url)
+                continue
+            # get url domain
+            logger.info(f"Matched url: {url[:32]}... {inspect.getfile(parser.__class__)}")
 
     def scrape_url(self, url: str)-> List[WaitDownloadItem]:
         items = []
@@ -47,6 +76,10 @@ class RSS(object):
                     logger.error(f"Failed to scrape {url}")
                 else:
                     items = parser.parse(content)
+        if not items:
+            return []
+        if not isinstance(items[0], WaitDownloadItem):
+            items = [from_dict_to_dataclass(WaitDownloadItem, data) for data in items]
         items = self.filter_by_rules(items)
         items = self.filter_by_duplicate(items)
         return items

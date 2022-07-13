@@ -22,7 +22,6 @@ app = FastAPI()
 
 @app.post("/add_torrent")
 async def add_torrent(item: AddTorrent):
-    print(item)
     redisDB.add_to_torrent_queue(WaitDownloadItem(item.name, item.url))
     return {"message": "OK!"}
 

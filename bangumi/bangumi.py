@@ -1,4 +1,3 @@
-
 from glob import glob
 import logging
 import os
@@ -20,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 
 class Bangumi(object):
-
     def __init__(self) -> None:
         super().__init__()
         self.rss = RSS()

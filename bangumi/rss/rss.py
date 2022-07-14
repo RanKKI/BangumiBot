@@ -18,13 +18,10 @@ from .rss_parser import RSSParser
 
 logger = logging.getLogger(__name__)
 
-class RSS(object):
 
+class RSS(object):
     def __init__(self, urls: List[str] = None) -> None:
-        self.__parsers: List[RSSParser] = [
-            MiKanRSS(),
-            DMHYRSS()
-        ]
+        self.__parsers: List[RSSParser] = [MiKanRSS(), DMHYRSS()]
         self.urls = urls or []
         self.rules = [
             # 正则表达式，会过滤结果
@@ -65,7 +62,9 @@ class RSS(object):
                 self.urls.remove(url)
                 continue
             # get url domain
-            logger.info(f"Matched url: {url[:32]}... {inspect.getfile(parser.__class__)}")
+            logger.info(
+                f"Matched url: {url[:32]}... {inspect.getfile(parser.__class__)}"
+            )
 
     def __get_parser(self, url: str) -> RSSParser:
         for parser in self.__parsers:
@@ -73,7 +72,7 @@ class RSS(object):
                 return parser
         return None
 
-    def scrape_url(self, url: str)-> List[WaitDownloadItem]:
+    def scrape_url(self, url: str) -> List[WaitDownloadItem]:
         items = []
         parser = self.__get_parser(url)
         if not parser:
@@ -107,7 +106,9 @@ class RSS(object):
         items = self.filter_by_duplicate(items)
         return items
 
-    def filter_by_time(self, items: List[WaitDownloadItem], last_scrape_time: int) -> List[WaitDownloadItem]:
+    def filter_by_time(
+        self, items: List[WaitDownloadItem], last_scrape_time: int
+    ) -> List[WaitDownloadItem]:
         return [item for item in items if item.pub_at > last_scrape_time]
 
     def filter_by_rules(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
@@ -124,7 +125,9 @@ class RSS(object):
 
         return ret
 
-    def filter_by_duplicate(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
+    def filter_by_duplicate(
+        self, items: List[WaitDownloadItem]
+    ) -> List[WaitDownloadItem]:
         """
         对重复的 RSS 数据进行过滤
         根据分辨率选择最高清的
@@ -150,7 +153,7 @@ class RSS(object):
 
         for val in seen.values():
             # sort val by dpi
-            val = sorted(val, key=lambda x:get_dpi_idx(x[1]))
+            val = sorted(val, key=lambda x: get_dpi_idx(x[1]))
             ret.append(val[0][0])
 
         return ret

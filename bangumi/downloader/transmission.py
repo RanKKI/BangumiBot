@@ -13,15 +13,15 @@ logger = logging.getLogger(__name__)
 
 
 def handle_api_error(default_val: Any):
-
     def _inner(func):
-
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
             except TransmissionError as e:
-                logger.error("[%s] Failed to connect to Transmission %s", func.__name__, e)
+                logger.error(
+                    "[%s] Failed to connect to Transmission %s", func.__name__, e
+                )
 
                 if callable(default_val):
                     return default_val()
@@ -32,15 +32,15 @@ def handle_api_error(default_val: Any):
 
     return _inner
 
-class TransmissionDownloader(Downloader):
 
+class TransmissionDownloader(Downloader):
     def __init__(self, **kwargs):
         super().__init__()
 
-        host = kwargs.pop('host', 'localhost')
-        port = kwargs.pop('port', 6800)
-        username = kwargs.pop('username', '')
-        password = kwargs.pop('password', '')
+        host = kwargs.pop("host", "localhost")
+        port = kwargs.pop("port", 6800)
+        username = kwargs.pop("username", "")
+        password = kwargs.pop("password", "")
 
         logger.info(f"Transmission Connecting to {host}:{port}")
 
@@ -70,7 +70,7 @@ class TransmissionDownloader(Downloader):
     def remove_torrent(self, item: DownloadItem) -> bool:
         self.client.remove_torrent(ids=item.hash)
 
-    @handle_api_error(lambda : [])
+    @handle_api_error(lambda: [])
     def get_downloads(self, state: int = DownloadState.NONE) -> List[DownloadItem]:
         resp = self.client.get_torrents()
 
@@ -78,7 +78,7 @@ class TransmissionDownloader(Downloader):
             return DownloadItem(
                 hash=item.hashString,
                 name=item.name,
-                files=[Path(x.name) for x in item.files()]
+                files=[Path(x.name) for x in item.files()],
             )
 
         if state == DownloadState.NONE:
@@ -89,7 +89,9 @@ class TransmissionDownloader(Downloader):
             add = False
             if state & DownloadState.FINISHED and item.progress >= 100:
                 add = True
-            if state & DownloadState.DOWNLOADING and (item.status.download_pending or item.status.downloading):
+            if state & DownloadState.DOWNLOADING and (
+                item.status.download_pending or item.status.downloading
+            ):
                 add = True
             if state & DownloadState.PAUSED and item.status.stopped:
                 add = True

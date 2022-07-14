@@ -27,7 +27,8 @@ class RedisDB(object):
             host=os.environ.get(Env.REDIS_HOST.value, "localhost"),
             port=os.environ.get(Env.REDIS_PORT.value, "6379"),
             password=os.environ.get(Env.REDIS_PASSWORD.value, ""),
-            decode_responses=True
+            decode_responses=True,
+            socket_connect_timeout=5
         )
         ret = self.client.info()
         logger.info(f"Connected to Redis, version {ret['redis_version']}")

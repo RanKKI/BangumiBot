@@ -62,19 +62,20 @@ class Bangumi(object):
         self.notification.call(ret)
 
     @safe_call
-    def check(self, last_dt: int):
+    def check(self, last_dt: int) -> bool:
         logger.info("Checking RSS...")
         items = self.rss.scrape(last_dt)
         logger.info("Found %d items", len(items))
         redisDB.add_to_torrent_queue(items)
+        return True
 
     @safe_call
     def check_complete(self):
         logger.debug("Checking complete...")
         try:
             completed = downloader.get_downloads(DownloadState.FINISHED)
-        except requests.exceptions.ConnectionError:
-            logger.error("Failed to get completed torrents")
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"Failed to get completed torrents {e}")
             return
 
         if len(completed) == 0:
@@ -105,8 +106,7 @@ class Bangumi(object):
         while True:
             current = int(time())
             last = redisDB.get_last_checked_time()
-            if current - last > INTERVAL:
-                self.check(last)
+            if current - last > INTERVAL and self.check(last):
                 redisDB.update_last_checked_time()
             self.check_complete()
             self.check_queue()
@@ -130,13 +130,21 @@ class Bangumi(object):
         rss_config = config_folder / "rss.json"
         if rss_config.exists():
             self.rss.load_config(rss_config)
+        else:
+            logger.info("No RSS config found, Skip...")
         notification_config = config_folder / "notification.json"
         if notification_config.exists():
             self.notification.load_config(notification_config)
+        else:
+            logger.info("No notification config found, Skip...")
 
     def run(self):
         logger.info("Starting...")
-        redisDB.connect()
+        try:
+            redisDB.connect()
+        except Exception as e:
+            logger.error(e)
+            return
         downloader.connect()
         self.load_config()
         if redisDB.init():

@@ -67,15 +67,24 @@ class RSS(object):
             # get url domain
             logger.info(f"Matched url: {url[:32]}... {inspect.getfile(parser.__class__)}")
 
-    def scrape_url(self, url: str)-> List[WaitDownloadItem]:
-        items = []
+    def __get_parser(self, url: str) -> RSSParser:
         for parser in self.__parsers:
             if parser.is_matched(url):
-                content = parser.request_rss(url)
-                if content is None:
-                    logger.error(f"Failed to scrape {url}")
-                else:
-                    items = parser.parse(content)
+                return parser
+        return None
+
+    def scrape_url(self, url: str)-> List[WaitDownloadItem]:
+        items = []
+        parser = self.__get_parser(url)
+        if not parser:
+            logger.error(f"Failed to get parser for url: {url}")
+            return []
+        try:
+            content = parser.request_rss(url)
+        except Exception as e:
+            logger.error(f"Failed to scrape {url} {e}")
+            return []
+        items = parser.parse(content)
         if not items:
             return []
         if not isinstance(items[0], WaitDownloadItem):

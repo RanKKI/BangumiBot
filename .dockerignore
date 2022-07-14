@@ -1,0 +1,15 @@
+# Ignore useless files
+config_example/
+tests/
+README.md
+
+# Ignore git
+.github
+.git
+
+# Ignore environment file
+.env
+.venv
+
+# Ignore Cache
+.cache

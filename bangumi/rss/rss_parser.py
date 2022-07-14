@@ -10,8 +10,8 @@ from bangumi.entitiy import WaitDownloadItem
 
 logger = logging.getLogger(__name__)
 
-class RSSParser(ABC):
 
+class RSSParser(ABC):
     def request_rss(self, url: str) -> bs4.BeautifulSoup:
         ret = requests.get(url)
         if ret.status_code != 200:

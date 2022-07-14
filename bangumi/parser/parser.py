@@ -36,7 +36,6 @@ CHINESE_NUMBER_MAP = {
 
 
 class Parser:
-
     @staticmethod
     def get_group(name: str) -> str:
         return re.split(r"[\[\]]", name)[1]
@@ -83,8 +82,7 @@ class Parser:
             elif re.search(" - {1}", name) is not None:
                 split = re.split("-", name)
         if len(split) == 1:
-            match_obj = re.match(
-                r"([^\x00-\xff]{1,})(\s)([\x00-\xff]{4,})", name)
+            match_obj = re.match(r"([^\x00-\xff]{1,})(\s)([\x00-\xff]{4,})", name)
             if match_obj is not None:
                 return match_obj.group(3), split
         compare, compare_idx = 0, 0
@@ -122,11 +120,10 @@ class Parser:
         content_title = Parser.pre_process(raw_title)  # 预处理标题
         group = Parser.get_group(content_title)  # 翻译组的名字
         match_obj = TITLE_RE.match(content_title)  # 处理标题
-        season_info, episode_info, other = list(map(
-            lambda x: x.strip(), match_obj.groups()
-        ))
-        raw_name, season_raw, season = Parser.__season_process(
-            season_info)  # 处理 第n季
+        season_info, episode_info, other = list(
+            map(lambda x: x.strip(), match_obj.groups())
+        )
+        raw_name, season_raw, season = Parser.__season_process(season_info)  # 处理 第n季
         name, name_group = "", ""
         try:
             name, name_group = Parser.__name_process(raw_name)  # 处理 名字
@@ -146,8 +143,7 @@ class Parser:
             ret = Parser.__process(raw_title)
             if ret is None:
                 return None
-            name, season, sr, episode, \
-                sub, dpi, source, ng, group = ret
+            name, season, sr, episode, sub, dpi, source, ng, group = ret
         except Exception as e:
             logger.error(f"ERROR match {raw_title} {e}")
             return None

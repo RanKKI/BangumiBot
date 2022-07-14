@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from typing import List
 
@@ -9,7 +8,6 @@ from .rss_parser import RSSParser
 
 
 class MiKanRSS(RSSParser):
-
     def is_matched(self, url: str) -> bool:
         return url.startswith("https://mikanani.me")
 
@@ -21,10 +19,12 @@ class MiKanRSS(RSSParser):
             pub_date = item.find("torrent").find("pubDate").text
             # 2022-07-06T23:00:52.205
             pub_datetime = datetime.strptime(pub_date, "%Y-%m-%dT%H:%M:%S.%f")
-            ret.append(WaitDownloadItem(
-                name=title,
-                url=url,
-                pub_at=int(pub_datetime.timestamp()),
-            ))
+            ret.append(
+                WaitDownloadItem(
+                    name=title,
+                    url=url,
+                    pub_at=int(pub_datetime.timestamp()),
+                )
+            )
 
         return ret

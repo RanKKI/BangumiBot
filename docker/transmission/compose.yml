@@ -9,30 +9,27 @@ services:
       auto_bangumi:
         ipv4_address: 10.1.0.20
 
-  aria2:
-    container_name: aria2
-    image: p3terx/aria2-pro:latest
-    restart: unless-stopped
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
     environment:
-      - PUID=${UID}
-      - PGID=${GID}
-      - UMASK_SET=022
-      - RPC_PORT=6800
-      - LISTEN_PORT=6888
-      - RPC_SECRET=bangumi_aria2
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - TRANSMISSION_WEB_HOME=/ui/
+      - USER=username
+      - PASS=password
+    volumes:
+      - ${DOWNLOAD_PATH}:/downloads
+      - ${DOWNLOAD_CONFIG}:/config
     ports:
-      - 6800:6800
-      - 6888:6888
-      - 6888:6888/udp
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
     networks:
       auto_bangumi:
         ipv4_address: 10.1.0.21
-    logging:
-      options:
-        max-size: "10m"
-    volumes:
-      - ${DOWNLOAD_PATH}:/downloads
-      - ${ARIA2_CONFIG}:/config
 
   bangumi:
     container_name: bangumi
@@ -40,11 +37,11 @@ services:
     restart: unless-stopped
     environment:
       - BANGUMI_CHECK_INTERVAL=600
-      - BANGUMI_CLIENT_TYPE=aria2
+      - BANGUMI_CLIENT_TYPE=transmission
       - BANGUMI_CLIENT_IP=10.1.0.21
-      - BANGUMI_CLIENT_PORT=6800
-      - BANGUMI_CLIENT_USERNAME=
-      - BANGUMI_CLIENT_PASSWORD=bangumi_aria2
+      - BANGUMI_CLIENT_PORT=9091
+      - BANGUMI_CLIENT_USERNAME=username
+      - BANGUMI_CLIENT_PASSWORD=password
       - BANGUMI_REDIS_HOST=10.1.0.20
       - BANGUMI_REDIS_PORT=6379
       - BANGUMI_REDIS_PASSWORD=
@@ -56,9 +53,6 @@ services:
     depends_on:
       - redis
       - aria2
-    logging:
-      options:
-        max-size: "10m"
     volumes:
       - ${DOWNLOAD_PATH}:/downloads
       - ${BANGUMI_CONFIG}:/config

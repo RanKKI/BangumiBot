@@ -1,0 +1,64 @@
+services:
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    networks:
+      auto_bangumi:
+        ipv4_address: 10.1.0.20
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - WEBUI_PORT=8080
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    networks:
+      auto_bangumi:
+        ipv4_address: 10.1.0.21
+    volumes:
+      - ${DOWNLOAD_PATH}:/downloads
+      - ${DOWNLOAD_CONFIG}:/config
+    restart: unless-stopped
+
+  bangumi:
+    container_name: bangumi
+    image: rankki/bangumi:latest
+    restart: unless-stopped
+    environment:
+      - BANGUMI_CHECK_INTERVAL=600
+      - BANGUMI_CLIENT_TYPE=qbittorrent
+      - BANGUMI_CLIENT_IP=10.1.0.21
+      - BANGUMI_CLIENT_PORT=8080
+      - BANGUMI_CLIENT_USERNAME=admin
+      - BANGUMI_CLIENT_PASSWORD=adminadmin
+      - BANGUMI_REDIS_HOST=10.1.0.20
+      - BANGUMI_REDIS_PORT=6379
+      - BANGUMI_REDIS_PASSWORD=
+    ports:
+      - 8000:8000
+    networks:
+      auto_bangumi:
+        ipv4_address: 10.1.0.22
+    depends_on:
+      - redis
+      - qbittorrent
+    volumes:
+      - ${DOWNLOAD_PATH}:/downloads
+      - ${BANGUMI_CONFIG}:/config
+      - ${MEDIA_PATH}:/media
+
+networks:
+  auto_bangumi:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.1.0.0/24

@@ -1,0 +1,21 @@
+services:
+  bangumi:
+    container_name: bangumi
+    image: rankki/bangumi:latest
+    restart: unless-stopped
+    environment:
+      - BANGUMI_CHECK_INTERVAL=600
+      - BANGUMI_CLIENT_TYPE=aria2
+      - BANGUMI_CLIENT_IP=10.1.0.21
+      - BANGUMI_CLIENT_PORT=6800
+      - BANGUMI_CLIENT_USERNAME=username
+      - BANGUMI_CLIENT_PASSWORD=password
+      - BANGUMI_REDIS_HOST=10.1.0.20
+      - BANGUMI_REDIS_PORT=6379
+      - BANGUMI_REDIS_PASSWORD=
+    ports:
+      - 8000:8000
+    volumes:
+      - ${DOWNLOAD_PATH}:/downloads
+      - ${BANGUMI_CONFIG}:/config
+      - ${MEDIA_PATH}:/media

@@ -83,13 +83,15 @@ docker run --name bangumi \
 
 ```
 cat << EOF > .env
-DOWNLOAD_PATH=/arai2-downloads
-BANGUMI_CONFIG=/bangumi-config
+DOWNLOAD_PATH=/arai2_downloads
+BANGUMI_CONFIG=/bangumi_config
 MEDIA_PATH=/media
-ARIA2_CONFIG=/aria2-config
+DOWNLOAD_CONFIG=/bt_config
 GID=${GID}
 UID=${UID}
 EOF
+
+cd /docker/<downloader>/ # 这里进入到你想使用的下载器的目录里
 
 docker compose up
 ```

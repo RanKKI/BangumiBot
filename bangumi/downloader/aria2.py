@@ -9,10 +9,9 @@ from .downloader import Downloader, DownloadState
 
 logger = logging.getLogger(__name__)
 
+
 def handle_api_error(default_val: Any):
-
     def _inner(func):
-
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
@@ -29,33 +28,27 @@ def handle_api_error(default_val: Any):
 
     return _inner
 
-class Aria2Downloader(Downloader):
 
+class Aria2Downloader(Downloader):
     def __init__(self, **kwargs):
         super().__init__()
 
-        host = kwargs.pop('host', 'localhost')
-        if not host.startswith('http'):
-            host = 'http://' + host
+        host = kwargs.pop("host", "localhost")
+        if not host.startswith("http"):
+            host = "http://" + host
 
-        port = kwargs.pop('port', 6800)
-        secret = kwargs.pop('secret', '')
+        port = kwargs.pop("port", 6800)
+        secret = kwargs.pop("secret", "")
 
         logger.info(f"Aria2 Connecting to {host}:{port}")
 
-        self.client = API(
-            Client(
-                host=host,
-                port=port,
-                secret=secret
-            )
-        )
+        self.client = API(Client(host=host, port=port, secret=secret))
 
     def connect(self):
         try:
             ver = self.client.client.get_version()
             if isinstance(ver, dict):
-                logger.info("Connected to aria2: %s", ver['version'])
+                logger.info("Connected to aria2: %s", ver["version"])
             else:
                 logger.info("Connected to aria2: %s", ver)
         except Exception as e:
@@ -63,11 +56,7 @@ class Aria2Downloader(Downloader):
 
     def __wrap_aria2_item(self, item: Download) -> DownloadItem:
         files = [x.path for x in item.files]
-        return DownloadItem(
-            hash=item.info_hash,
-            name=item.name,
-            files=files
-        )
+        return DownloadItem(hash=item.info_hash, name=item.name, files=files)
 
     @handle_api_error(False)
     def add_torrent_by_magnet(self, magnet: str) -> bool:
@@ -81,7 +70,9 @@ class Aria2Downloader(Downloader):
     def remove_torrent(self, item: DownloadItem) -> bool:
         downloads = self.client.get_downloads()
 
-        targets = [download for download in downloads if download.info_hash == item.hash]
+        targets = [
+            download for download in downloads if download.info_hash == item.hash
+        ]
 
         if len(targets) == 0:
             return False
@@ -103,14 +94,20 @@ class Aria2Downloader(Downloader):
         for download in downloads:
             add = False
             if state & DownloadState.DOWNLOADING:
-                if download.status == "active" and download.completed_length < download.total_length:
+                if (
+                    download.status == "active"
+                    and download.completed_length < download.total_length
+                ):
                     add = True
 
             if state & DownloadState.FINISHED:
 
                 if download.status == "complete":
                     add = True
-                if download.status == "active" and download.completed_length == download.total_length:
+                if (
+                    download.status == "active"
+                    and download.completed_length == download.total_length
+                ):
                     add = True
 
             if state & DownloadState.ERROR and download.status == "error":

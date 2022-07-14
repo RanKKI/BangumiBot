@@ -17,26 +17,17 @@ def build_downloader() -> Downloader:
     password = os.environ.get(Env.CLIENT_PASSWORD.value, None)
 
     if client_type == "aria2":
-        return Aria2Downloader(
-            host=host,
-            port=port,
-            secret=password
-        )
+        return Aria2Downloader(host=host, port=port, secret=password)
     elif client_type == "qbittorrent" or client_type == "qb":
         return QBittorrentDownloader(
-            host=host,
-            port=port,
-            username=username,
-            password=password
+            host=host, port=port, username=username, password=password
         )
     elif client_type == "transmission":
         return TransmissionDownloader(
-            host=host,
-            port=port,
-            username=username,
-            password=password
+            host=host, port=port, username=username, password=password
         )
     raise ValueError("Client type not specified")
+
 
 downloader: Downloader = None
 

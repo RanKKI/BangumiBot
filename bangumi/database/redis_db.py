@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class RedisDB(object):
-
     def __init__(self) -> None:
         self.client: redis.Redis = None
 
@@ -28,7 +27,7 @@ class RedisDB(object):
             port=os.environ.get(Env.REDIS_PORT.value, "6379"),
             password=os.environ.get(Env.REDIS_PASSWORD.value, ""),
             decode_responses=True,
-            socket_connect_timeout=5
+            socket_connect_timeout=5,
         )
         ret = self.client.info()
         logger.info(f"Connected to Redis, version {ret['redis_version']}")
@@ -48,7 +47,9 @@ class RedisDB(object):
     def get_last_checked_time(self) -> int:
         return int(self.client.get("last_checked_time") or 0)
 
-    def add_to_torrent_queue(self, items: Union[WaitDownloadItem, List[WaitDownloadItem]]) -> None:
+    def add_to_torrent_queue(
+        self, items: Union[WaitDownloadItem, List[WaitDownloadItem]]
+    ) -> None:
         if isinstance(items, WaitDownloadItem):
             items = [items]
         for item in items:

@@ -1,4 +1,3 @@
-
 import logging
 import os
 from abc import ABC, abstractmethod
@@ -13,6 +12,7 @@ from bangumi.entitiy import DownloadItem
 
 logger = logging.getLogger(__name__)
 
+
 class DownloadState:
     NONE = 1 << 0
     DOWNLOADING = 1 << 1
@@ -25,7 +25,6 @@ TorrentFinishedCB = Callable[[DownloadItem], None]
 
 
 class Downloader(ABC):
-
     def __init__(self):
         self.on_torrent_finished_callback: TorrentFinishedCB = None
         self.cache_folder = Path(os.environ.get(Env.CACHE_FOLDER.value, ".cache"))
@@ -67,7 +66,5 @@ class Downloader(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def get_downloads(
-            self,
-            state: int = DownloadState.NONE) -> List[DownloadItem]:
+    def get_downloads(self, state: int = DownloadState.NONE) -> List[DownloadItem]:
         raise NotImplementedError()

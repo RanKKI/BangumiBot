@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -8,8 +7,8 @@ from typing import List
 
 logger = logging.getLogger(__name__)
 
-class Notification(object):
 
+class Notification(object):
     def __init__(self) -> None:
         self.callbacks: List[str] = []
 
@@ -26,13 +25,13 @@ class Notification(object):
             self.__call(callback, title)
 
     def __call(self, callback: str, title: str):
-        if callback.startswith('http'):
+        if callback.startswith("http"):
             self.__call_http(callback.format(title=title))
         elif os.path.exists(callback):
             self.__call_script(callback, title)
 
     def __call_http(self, url: str):
-        check_call(['curl', '-X', 'GET', url], stdout=DEVNULL, stderr=STDOUT)
+        check_call(["curl", "-X", "GET", url], stdout=DEVNULL, stderr=STDOUT)
 
     def __call_script(self, script: str, title: str):
         check_call([script, title], stdout=DEVNULL, stderr=STDOUT)

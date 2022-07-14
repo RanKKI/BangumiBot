@@ -30,7 +30,6 @@ class EpisodeInfo:
 
 @dataclass
 class Episode:
-
     @property
     def title(self) -> str:
         return self.title_info.name
@@ -56,4 +55,9 @@ class Episode:
 
     def get_full_path(self, ext: str = "") -> Path:
         media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
-        return media / Path(self.title) / f"Season {self.season_info.number}" / f"{self.formatted}{ext}"
+        return (
+            media
+            / Path(self.title)
+            / f"Season {self.season_info.number}"
+            / f"{self.formatted}{ext}"
+        )

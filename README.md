@@ -96,6 +96,7 @@ docker compose up
 
 ## 配置
 ### RSS
+注意过滤的 `rules`，如果**命中**则会被**舍去**。**并非只下载命中资源**
 ```
 /config/rss.json
 {
@@ -104,13 +105,13 @@ docker compose up
       {
         "url": "https://mikanani.me/RSS/MyBangumi?token=<token>",
         "rules": [
-          r"^过滤选择" # 针对该站点单独过滤
+          "^过滤选择" # 针对该站点单独过滤
         ]
       }
     ],
     "rules": [ // 关键词过滤，正则表达
-      r".*繁体.*",
-      r"^另一个过滤"
+      ".*繁体.*",
+      "^另一个过滤"
     ],
     "parsers": [
         {
@@ -122,14 +123,19 @@ docker compose up
         }
     ]
 }
-
 ```
+
 ### 通知
+`url` 回掉会使用 `curl -X GET {url}` 调用，暂不支持 `POST` 请求
+
+脚本调用需要传入绝对路径，可以是 `/bin/bash /path/to/script.sh`。如果使用 Docker 容器方式运行本项目，需要将脚本目录挂在进容器，同时脚本目录是容器内的目录，并非本机目录。
+
+脚本调用不需要像 `url` 一样加入 `{title}`。脚本第一个参数就是就是名字，比如配置 `/bin/bash /path/to/script.sh`，调用会执行 `/bin/bash /path/to/script.sh 'OVERLORD S02E03'`
 ```
 /config/notification.json
 [
     "https://api.day.app/<you-key-here>/番剧更新！/{title}", # http 通知
-    "/bin/script" # 脚本通知, 第一个参数为 {title}
+    "/bin/script" # 脚本通知, 第一个参数为格式化后的名字
 ]
 ```
 

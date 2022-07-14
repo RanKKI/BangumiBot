@@ -1,3 +1,4 @@
 [
-    "https://api.day.app/<you-key-here>/番剧更新！/{title}"
+    "https://api.day.app/<you-key-here>/番剧更新！/{title}",
+    "/bin/sh /notice.sh"
 ]

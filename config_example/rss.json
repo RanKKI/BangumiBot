@@ -1,6 +1,16 @@
 {
-    "urls": [],
-    "rules": [],
+    "urls": [
+        "https://bangumi.moe/rss/latest",
+        {
+            "url": "https://dmhy.org/topics/rss/rss.xml",
+            "rules": [
+                ".*[^(來自深淵)|(来自深渊)].*"
+            ]
+        }
+    ],
+    "rules": [
+        ".*日剧.*"
+    ],
     "parsers": [
         {
             "folder": "/path/to/plugins",

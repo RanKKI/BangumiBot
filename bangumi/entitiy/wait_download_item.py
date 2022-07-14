@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-
-from bangumi.util.torrent import extract_hash_from_url
+import os
+import re
+from urllib.parse import urlparse
 
 
 @dataclass
@@ -11,4 +12,8 @@ class WaitDownloadItem:
 
     @property
     def hash(self):
-        return extract_hash_from_url(self.url)
+        if self.url.startswith("magnet:"):
+            return re.search(r"btih:([a-zA-Z0-9]{32})", self.url).group(1)
+        if self.url.startswith("http"):
+            return os.path.splitext(os.path.basename(urlparse(self.url).path))[0]
+        raise ValueError("Invalid url: {}".format(self.url))

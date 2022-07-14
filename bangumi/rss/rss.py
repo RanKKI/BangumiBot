@@ -2,15 +2,18 @@ import inspect
 import json
 import logging
 import os
-from pathlib import Path
 import re
 from collections import defaultdict
+from pathlib import Path
 from typing import Dict, List, Union
 
-from bangumi.entitiy.wait_download_item import WaitDownloadItem
+from bangumi.entitiy import RSSSite, WaitDownloadItem
 from bangumi.parser import Parser
-from bangumi.util.data_class import from_dict_to_dataclass
-from bangumi.util.plugin import dynamic_get_class
+from bangumi.util import (
+    filter_download_item_by_rules,
+    dynamic_get_class,
+    from_dict_to_dataclass,
+)
 
 from .dmhy import DMHYRSS
 from .mikan import MiKanRSS
@@ -20,9 +23,9 @@ logger = logging.getLogger(__name__)
 
 
 class RSS(object):
-    def __init__(self, urls: List[str] = None) -> None:
+    def __init__(self) -> None:
         self.__parsers: List[RSSParser] = [MiKanRSS(), DMHYRSS()]
-        self.urls = urls or []
+        self.sites: List[RSSSite] = []
         self.rules = [
             # 正则表达式，会过滤结果
         ]
@@ -32,7 +35,14 @@ class RSS(object):
             return
         with open(config_path, "r") as f:
             data = json.load(f)
-        self.urls = data.get("urls", [])
+        for url in data.get("urls", []):
+            site: RSSSite = None
+            if isinstance(url, str):
+                site = RSSSite(url=url)
+            elif isinstance(url, dict):
+                site = from_dict_to_dataclass(RSSSite, url)
+            self.sites.append(site)
+
         self.rules = data.get("rules", [])
         for rule in self.rules:
             logger.info(f"Loaded rule: {rule}")
@@ -51,19 +61,19 @@ class RSS(object):
         self.__parsers.extend([clz() for clz in clz_objects])
 
     def __validate_parser(self):
-        for url in self.urls:
+        for site in self.sites:
             matched = False
             for parser in self.__parsers:
-                if parser.is_matched(url):
+                if parser.is_matched(site.url):
                     matched = True
                     break
             if not matched:
-                logger.error(f"Failed to match url: {url}")
-                self.urls.remove(url)
+                logger.error(f"Failed to match url: {site.url}")
+                self.sites.remove(site.url)
                 continue
             # get url domain
             logger.info(
-                f"Matched url: {url[:32]}... {inspect.getfile(parser.__class__)}"
+                f"Matched url: {site.url[:32]}... {inspect.getfile(parser.__class__)}"
             )
 
     def __get_parser(self, url: str) -> RSSParser:
@@ -88,7 +98,6 @@ class RSS(object):
             return []
         if not isinstance(items[0], WaitDownloadItem):
             items = [from_dict_to_dataclass(WaitDownloadItem, data) for data in items]
-        items = self.filter_by_rules(items)
         items = self.filter_by_duplicate(items)
         return items
 
@@ -98,11 +107,12 @@ class RSS(object):
         """
         items = []
 
-        for url in self.urls:
-            items += self.scrape_url(url)
+        for site in self.sites:
+            ret = self.scrape_url(site.url)
+            items += filter_download_item_by_rules(site.rules, ret)
 
         items = self.filter_by_time(items, last_scrape_time)
-        items = self.filter_by_rules(items)
+        items = filter_download_item_by_rules(self.rules, items)
         items = self.filter_by_duplicate(items)
         return items
 
@@ -110,20 +120,6 @@ class RSS(object):
         self, items: List[WaitDownloadItem], last_scrape_time: int
     ) -> List[WaitDownloadItem]:
         return [item for item in items if item.pub_at > last_scrape_time]
-
-    def filter_by_rules(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
-        ret = []
-
-        for item in items:
-            matched = False
-            for rule in self.rules:
-                if re.match(rule, item.name):
-                    matched = True
-                    break
-            if not matched:
-                ret.append(item)
-
-        return ret
 
     def filter_by_duplicate(
         self, items: List[WaitDownloadItem]

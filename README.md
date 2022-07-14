@@ -14,6 +14,7 @@
    - [蜜柑计划](https://mikanani.me/)
    - [动漫花园](https://dmhy.org/)
    - 自定义插件
+   - 自定义过滤（全局/站点）
  - 去重
    - 已下载番剧不会重复下载
    - 优先下载清晰度高的资源
@@ -99,7 +100,13 @@ docker compose up
 /config/rss.json
 {
     "urls": [ // 订阅链接
-      "https://mikanani.me/RSS/MyBangumi?token=<token>"
+      "https://mikanani.me/RSS/MyBangumi?token=<token>",
+      {
+        "url": "https://mikanani.me/RSS/MyBangumi?token=<token>",
+        "rules": [
+          r"^过滤选择" # 针对该站点单独过滤
+        ]
+      }
     ],
     "rules": [ // 关键词过滤，正则表达
       r".*繁体.*",

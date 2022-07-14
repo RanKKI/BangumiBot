@@ -4,7 +4,7 @@ from pathlib import Path
 from random import random
 
 from bangumi.parser import Parser
-from bangumi.util.files import move_file, setup_test_env
+from bangumi.util import move_file, setup_test_env
 
 
 class TestRawParser(unittest.TestCase):

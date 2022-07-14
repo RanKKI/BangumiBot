@@ -1,6 +1,5 @@
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import List
 
 import bs4
@@ -23,5 +22,5 @@ class RSSParser(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def parse(self, content) -> List[WaitDownloadItem]:
+    def parse(self, content: bs4.BeautifulSoup) -> List[WaitDownloadItem]:
         raise NotImplementedError()

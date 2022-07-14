@@ -8,7 +8,7 @@ from typing import List, Union
 import redis
 from bangumi.consts.env import Env
 from bangumi.entitiy import WaitDownloadItem
-from bangumi.util.data_class import from_dict_to_dataclass
+from bangumi.util import from_dict_to_dataclass
 
 logger = logging.getLogger(__name__)
 

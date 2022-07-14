@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class RSSParser(ABC):
-    def request_rss(self, url: str) -> bs4.BeautifulSoup:
+    async def request_rss(self, url: str) -> bs4.BeautifulSoup:
         ret = requests.get(url)
         if ret.status_code != 200:
             raise Exception(f"resp status code {ret.status_code}")

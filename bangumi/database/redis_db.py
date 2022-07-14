@@ -62,6 +62,13 @@ class RedisDB(object):
             return None
         return self.get(hash_)
 
+    async def get_pending(self) -> List[WaitDownloadItem]:
+        """
+        返回还未添加进下载队列
+        """
+        hash_arr = self.client.lrange("pool_list", 0, 50)
+        return [self.get(hash_) for hash_ in hash_arr]
+
     def get_key_from_formatted_name(self, name: str) -> str:
         ret = re.match(r"(.*) (S\d+E\d+)", name.strip())
         if not ret:

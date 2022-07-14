@@ -82,14 +82,15 @@ class RSS(object):
                 return parser
         return None
 
-    def scrape_url(self, url: str) -> List[WaitDownloadItem]:
+    async def scrape_url(self, url: str) -> List[WaitDownloadItem]:
+        logger.debug(f"scraping url {url}")
         items = []
         parser = self.__get_parser(url)
         if not parser:
             logger.error(f"Failed to get parser for url: {url}")
             return []
         try:
-            content = parser.request_rss(url)
+            content = await parser.request_rss(url)
         except Exception as e:
             logger.error(f"Failed to scrape {url} {e}")
             return []

@@ -12,6 +12,7 @@ from .rss import filter_download_item_by_rules
 from .clz import from_dict_to_dataclass
 from .plugin import dynamic_get_class
 
+
 def init_folders():
     cache = Path(os.environ.get(Env.CACHE_FOLDER.value, "cache"))
     media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))

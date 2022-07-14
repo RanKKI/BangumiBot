@@ -1,4 +1,4 @@
-name: unittest
+name: Unittest
 
 on:
   push:
@@ -15,7 +15,7 @@ env:
   TEST_ENV: True
 
 jobs:
-  build:
+  testing:
 
     runs-on: ubuntu-latest
 

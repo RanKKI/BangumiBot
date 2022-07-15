@@ -86,15 +86,24 @@ class Bangumi(object):
     def check_queue(self):
         logger.debug("Checking torrent queue...")
         count = 0
-        item = redisDB.pop_torrent_to_download()
-        while item:
-            info = Parser.parse_bangumi_name(item.name)
-            if not (info and redisDB.is_downloaded(info.formatted)):
-                redisDB.set_downloaded(info.formatted)
-                downloader.add_torrent(item.url)
-                logger.info(f"Added {item.url} to downloader")
-                count += 1
+        while True:
             item = redisDB.pop_torrent_to_download()
+            if not item:
+                break
+            info = Parser.parse_bangumi_name(item.name)
+            if info and redisDB.is_downloaded(info.formatted):
+                # 已经下载过了
+                redisDB.remove(item.hash)
+                continue
+            try:
+                downloader.add_torrent(item.url)
+            except Exception as e:
+                logger.error(f"Failed to add torrent {e}")
+                redisDB.add_to_torrent_queue(item)
+                continue
+            redisDB.set_downloaded(info.formatted)
+            logger.info(f"Added {item.url} to downloader")
+            count += 1
         if count > 0:
             logger.info("Added %d torrents to downloader", count)
 

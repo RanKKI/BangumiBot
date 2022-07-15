@@ -2,10 +2,7 @@ FROM python:3.10-alpine
 
 WORKDIR /src
 
-COPY . .
-
-RUN apk add build-base libxml2-dev libxslt-dev && \
-    pip install -r requirements.txt
+RUN apk add build-base libxml2-dev libxslt-dev curl
 
 # DO NOT EDIT
 # USER NEEDS MOUNT TO THESE DIRECTORY
@@ -13,6 +10,10 @@ ENV BANGUMI_DOWNLOAD_FOLDER=/downloads \
     BANGUMI_MEDIA_FOLDER=/media \
     BANGUMI_CONFIG_PATH=/config \
     BANGUMI_CACHE_FOLDER=/cache
+
+COPY . .
+
+RUN pip install -r requirements.txt
 
 # MAIN ENTRY
 RUN echo "#!/bin/bash" > ./start.sh && \

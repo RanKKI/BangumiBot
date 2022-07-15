@@ -91,19 +91,25 @@ class Bangumi(object):
             if not item:
                 break
             info = Parser.parse_bangumi_name(item.name)
-            if info and redisDB.is_downloaded(info.formatted):
-                # 已经下载过了
+            if not info:
+                logger.error(f"Failed to parse {item.name}")
+                continue
+
+            if redisDB.is_downloaded(info.formatted): # 已经下载过了
                 redisDB.remove(item.hash)
                 continue
+
             try:
                 downloader.add_torrent(item.url)
             except Exception as e:
                 logger.error(f"Failed to add torrent {e}")
                 redisDB.add_to_torrent_queue(item)
                 continue
+
             redisDB.set_downloaded(info.formatted)
             logger.info(f"Added {item.url} to downloader")
             count += 1
+
         if count > 0:
             logger.info("Added %d torrents to downloader", count)
 
@@ -118,7 +124,7 @@ class Bangumi(object):
                 redisDB.update_last_checked_time()
             self.check_complete()
             self.check_queue()
-            sleep(10)
+            sleep(30)
 
     def init(self):
         logger.info("init...")

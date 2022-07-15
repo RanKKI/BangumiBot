@@ -22,7 +22,10 @@ class Notification(object):
     def call(self, title: str):
         logger.info(f"Send notification: {title}")
         for callback in self.callbacks:
-            self.__call(callback, title)
+            try:
+                self.__call(callback, title)
+            except Exception as e:
+                logger.error(f"Failed to call {callback}: {e}")
 
     def __call(self, callback: str, title: str):
         if callback.startswith("http"):

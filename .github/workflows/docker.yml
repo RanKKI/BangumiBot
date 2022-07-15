@@ -29,8 +29,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          pull: true
           push: true
           tags: rankki/bangumi:latest
           context: .
           platforms: linux/amd64,linux/arm64, linux/arm/v7
+          cache-from: type=registry,ref=rankki/bangumi:cache
+          cache-to: type=registry,ref=rankki/bangumi:cache,mode=max

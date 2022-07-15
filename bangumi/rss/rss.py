@@ -102,14 +102,14 @@ class RSS(object):
         items = self.filter_by_duplicate(items)
         return items
 
-    def scrape(self, last_scrape_time: int) -> List[WaitDownloadItem]:
+    async def scrape(self, last_scrape_time: int) -> List[WaitDownloadItem]:
         """
         在主循环中调用此方法，获取 RSS 数据
         """
         items = []
 
         for site in self.sites:
-            ret = self.scrape_url(site.url)
+            ret = await self.scrape_url(site.url)
             items += filter_download_item_by_rules(site.rules, ret)
 
         items = self.filter_by_time(items, last_scrape_time)

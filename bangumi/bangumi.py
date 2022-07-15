@@ -1,3 +1,4 @@
+import asyncio
 from glob import glob
 import logging
 import os
@@ -60,12 +61,11 @@ class Bangumi(object):
         self.notification.call(ret)
 
     @safe_call
-    def check(self, last_dt: int) -> bool:
+    async def check(self, last_dt: int):
         logger.info("Checking RSS...")
-        items = self.rss.scrape(last_dt)
+        items = await self.rss.scrape(last_dt)
         logger.info("Found %d items", len(items))
         redisDB.add_to_torrent_queue(items)
-        return True
 
     @safe_call
     def check_complete(self):
@@ -98,13 +98,14 @@ class Bangumi(object):
         if count > 0:
             logger.info("Added %d torrents to downloader", count)
 
-    def loop(self):
+    async def loop(self):
         INTERVAL = int(os.environ.get(Env.CHECK_INTERVAL.value, 60 * 10))
 
         while True:
             current = int(time())
             last = redisDB.get_last_checked_time()
-            if current - last > INTERVAL and self.check(last):
+            if current - last > INTERVAL:
+                await self.check(last)
                 redisDB.update_last_checked_time()
             self.check_complete()
             self.check_queue()
@@ -147,4 +148,4 @@ class Bangumi(object):
         self.load_config()
         if redisDB.init():
             self.init()
-        self.loop()
+        asyncio.run(self.loop())

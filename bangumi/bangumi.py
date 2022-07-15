@@ -95,7 +95,7 @@ class Bangumi(object):
                 logger.error(f"Failed to parse {item.name}")
                 continue
 
-            if redisDB.is_downloaded(info.formatted): # 已经下载过了
+            if redisDB.is_downloaded(info.formatted):  # 已经下载过了
                 redisDB.remove(item.hash)
                 continue
 

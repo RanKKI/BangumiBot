@@ -142,7 +142,7 @@ extra_hosts:
 ```
 
 ### 通知
-`url` 回掉会使用 `curl -X GET {url}` 调用，暂不支持 `POST` 请求
+`url` 回调会使用 `curl` 调用，如果内置的无法满足需求，可以考虑使用脚本调用
 
 脚本调用需要传入绝对路径，可以是 `/bin/bash /path/to/script.sh`。如果使用 Docker 容器方式运行本项目，需要将脚本目录挂在进容器，同时脚本目录是容器内的目录，并非本机目录。
 
@@ -151,6 +151,13 @@ extra_hosts:
 /config/notification.json
 [
     "https://api.day.app/<you-key-here>/番剧更新！/{title}", # http 通知
+    {
+      "url": "https://<some-url>/番剧更新！",
+      "data": {
+        "token": "xxxxxxx", # title 会放在 POST 请求的 body 里
+      },
+      "method": "<POST|GET>"
+    }
     "/bin/script" # 脚本通知, 第一个参数为格式化后的名字
 ]
 ```

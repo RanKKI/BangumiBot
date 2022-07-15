@@ -1,4 +1,13 @@
 [
     "https://api.day.app/<you-key-here>/番剧更新！/{title}",
+    {
+        "url": "https://api.day.app/<you-key-here>",
+        "method": "POST",
+        "data": {
+            "extra": {
+                "token": "12j3kljdklfajkld"
+            }
+        }
+    },
     "/bin/sh /notice.sh"
 ]

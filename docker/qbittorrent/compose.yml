@@ -15,7 +15,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/London
+      - TZ=Asia/Shanghai
       - WEBUI_PORT=8080
     ports:
       - 8080:8080
@@ -34,6 +34,7 @@ services:
     image: rankki/bangumi:latest
     restart: unless-stopped
     environment:
+      - TZ=Asia/Shanghai
       - BANGUMI_CHECK_INTERVAL=600
       - BANGUMI_CLIENT_TYPE=qbittorrent
       - BANGUMI_CLIENT_IP=10.1.0.21

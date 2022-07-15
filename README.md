@@ -1,4 +1,7 @@
 # 自动追番
+[![Unittest](https://github.com/RanKKI/Bangumi/actions/workflows/test.yml/badge.svg)](https://github.com/RanKKI/Bangumi/actions/workflows/test.yml) [![Build](https://github.com/RanKKI/Bangumi/actions/workflows/docker.yml/badge.svg)](https://github.com/RanKKI/Bangumi/actions/workflows/docker.yml)
+
+
 懒惰使科技进步，自动订阅某些网站的 RSS，并根据 RSS 的更新下载番剧，重命名扔进 jellyfin 的媒体库进行刮削，从而实现自动追番
 
 项目想法来自 [EstrellaXD/Auto_Bangumi](https://github.com/EstrellaXD/Auto_Bangumi)，也贡献了一点代码，写了点测试用例和 `CI/CD`
@@ -94,6 +97,17 @@ EOF
 cd /docker/<downloader>/ # 这里进入到你想使用的下载器的目录里
 
 docker compose up
+```
+
+### Docker Proxy
+因为众所周知的原因，可能需要加代理，可以在环境变量中添加
+```
+environment:
+  - HTTPS_PROXY=http://host.docker.internal:20173
+  - HTTP_PROXY=http://host.docker.internal:20173
+  - NO_PROXY=10.1.0.1/16, 192.168.1.1/16, *.localhost, *.local, 127.0.0.0/8, localhost
+extra_hosts:
+  - "host.docker.internal:host-gateway"
 ```
 
 ## 配置

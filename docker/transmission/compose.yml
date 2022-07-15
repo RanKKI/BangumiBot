@@ -18,6 +18,7 @@ services:
       - TZ=Europe/London
       - TRANSMISSION_WEB_HOME=/ui/
       - USER=username
+      - TZ=Asia/Shanghai
       - PASS=password
     volumes:
       - ${DOWNLOAD_PATH}:/downloads
@@ -45,6 +46,7 @@ services:
       - BANGUMI_REDIS_HOST=10.1.0.20
       - BANGUMI_REDIS_PORT=6379
       - BANGUMI_REDIS_PASSWORD=
+      - TZ=Asia/Shanghai
     ports:
       - 8000:8000
     networks:

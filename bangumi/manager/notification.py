@@ -4,6 +4,7 @@ import os
 from subprocess import DEVNULL, STDOUT, check_call
 
 from typing import List
+from requests.utils import requote_uri
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,9 @@ class Notification(object):
             self.__call_script(callback, title)
 
     def __call_http(self, url: str):
-        check_call(["curl", "-X", "GET", url], stdout=DEVNULL, stderr=STDOUT)
+        check_call(
+            ["curl", "-X", "GET", requote_uri(url)], stdout=DEVNULL, stderr=STDOUT
+        )
 
     def __call_script(self, script: str, title: str):
         check_call([script, title], stdout=DEVNULL, stderr=STDOUT)

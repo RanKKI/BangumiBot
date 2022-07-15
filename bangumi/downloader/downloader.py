@@ -58,7 +58,7 @@ class Downloader(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def add_torrent_by_file(self, torrent_file: str) -> bool:
+    def add_torrent_by_file(self, torrent_file: Path) -> bool:
         raise NotImplementedError()
 
     @abstractmethod

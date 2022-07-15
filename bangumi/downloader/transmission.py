@@ -59,12 +59,8 @@ class TransmissionDownloader(Downloader):
         return self.client.add_torrent(magnet)
 
     @handle_api_error(False)
-    def add_torrent_by_url(self, url: str) -> bool:
-        return self.client.add_torrent(url)
-
-    @handle_api_error(False)
-    def add_torrent_by_file(self, torrent_file: str) -> bool:
-        return self.client.add_torrent(Path(torrent_file))
+    def add_torrent_by_file(self, torrent_file: Path) -> bool:
+        return self.client.add_torrent(torrent_file)
 
     @handle_api_error(False)
     def remove_torrent(self, item: DownloadItem) -> bool:

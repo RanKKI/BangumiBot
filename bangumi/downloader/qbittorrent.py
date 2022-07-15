@@ -62,11 +62,7 @@ class QBittorrentDownloader(Downloader):
         return self.client.torrents_add(urls=[magnet]) == "Ok."
 
     @handle_api_error(False)
-    def add_torrent_by_url(self, url: str) -> bool:
-        return self.client.torrents_add(urls=[url]) == "Ok."
-
-    @handle_api_error(False)
-    def add_torrent_by_file(self, torrent_file: str) -> bool:
+    def add_torrent_by_file(self, torrent_file: Path) -> bool:
         return self.client.torrents_add(torrent_files=[torrent_file]) == "Ok."
 
     @handle_api_error(False)

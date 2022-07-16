@@ -6,15 +6,15 @@ on:
       - 'main'
     paths:
       - '**.py'
-  pull_request:
-    branches:
-      - 'main'
 
 jobs:
   formatting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: formatting
         uses: psf/black@stable
@@ -22,11 +22,14 @@ jobs:
           options: "--verbose"
           src: "./bangumi"
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "style: auto fixes" -a
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          commit-message: "style: auto fixes"
-          title: Auto code style fixes
-          body: This is an auto-generated PR with style fixes.
-          labels: black, automated pr
-          branch: code-style-patches
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

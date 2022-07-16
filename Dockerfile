@@ -17,8 +17,7 @@ RUN pip install -r requirements.txt
 
 # MAIN ENTRY
 RUN echo "#!/bin/bash" > ./start.sh && \
-    echo "exec python3 ./main.py &" >> ./start.sh && \
-    echo "exec uvicorn bangumi:app --host 0.0.0.0 --log-config conf/log.yml" >> ./start.sh
+    echo "exec uvicorn main:app --host 0.0.0.0 --log-config conf/log.yml" >> ./start.sh
 
 # API PORT
 EXPOSE 8000

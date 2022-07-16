@@ -1,20 +1,21 @@
 import asyncio
-from glob import glob
 import logging
 import os
-from time import sleep, time
-
+import signal
+import threading
+from glob import glob
 from pathlib import Path
+from time import sleep, time
 
 import requests
 
 from bangumi.database import redisDB
 from bangumi.downloader import DownloadState, downloader
 from bangumi.entitiy import DownloadItem, WaitDownloadItem
-from bangumi.manager import Notification, notification
+from bangumi.manager import Notification
 from bangumi.parser import Parser
 from bangumi.rss import RSS
-from bangumi.util import Env, move_file, get_relative_path, safe_call
+from bangumi.util import Env, get_relative_path, move_file, safe_call
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,7 @@ class Bangumi(object):
         super().__init__()
         self.rss = RSS()
         self.notification = Notification()
+        self.is_running = False
 
     def rename(self, item: DownloadItem, info: WaitDownloadItem) -> str:
         logger.info(f"Renaming {item.hash} {item.name}...")
@@ -116,7 +118,7 @@ class Bangumi(object):
     async def loop(self):
         INTERVAL = int(os.environ.get(Env.CHECK_INTERVAL.value, 60 * 10))
 
-        while True:
+        while self.is_running:
             current = int(time())
             last = redisDB.get_last_checked_time()
             if current - last > INTERVAL:
@@ -153,14 +155,31 @@ class Bangumi(object):
             logger.info("No notification config found, Skip...")
 
     def run(self):
+        self.is_running = True
         logger.info("Starting...")
-        try:
-            redisDB.connect()
-        except Exception as e:
-            logger.error(e)
-            return
-        downloader.connect()
         self.load_config()
         if redisDB.init():
             self.init()
         asyncio.run(self.loop())
+
+    def stop(self):
+        logger.info("Stopping...")
+        self.is_running = False
+
+
+class BangumiBackgroundTask(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.daemon = True
+        self.bangumi = Bangumi()
+        signal.signal(signal.SIGINT, self.stop)
+        signal.signal(signal.SIGTERM, self.stop)
+
+    def run(self):
+        try:
+            self.bangumi.run()
+        except:
+            os._exit(1)
+
+    def stop(self, *args, **kwargs):
+        self.bangumi.stop()

@@ -38,8 +38,7 @@
  - 修改[订阅](#rss)配置文件 `./config/rss.json `
  - 修改[通知](#通知)配置文件 `./config/notification.json`
  - 安装依赖 `pip install -r requirements.txt`
- - 启动项目 `python main.py`
- - 启动 API 服务 `uvicorn bangumi:app`
+ - 启动服务 `uvicorn main:app --host 0.0.0.0 --log-config conf/log.yml`
 
 ## Docker
 

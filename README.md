@@ -37,6 +37,9 @@
  - 复制文件夹 ./config_example 到 ./config
  - 修改[订阅](#rss)配置文件 `./config/rss.json `
  - 修改[通知](#通知)配置文件 `./config/notification.json`
+ - 安装依赖 `pip install -r requirements.txt`
+ - 启动项目 `python main.py`
+ - 启动 API 服务 `uvicorn bangumi:app`
 
 ## Docker
 
@@ -82,11 +85,11 @@ docker run --name bangumi \
 
 ### Docker Compose
 
-一键启动 Redis, Aria2 和本项目
-
-注意，不带 Aria2 Web UI, 如果有需要可以使用 [ziahamza/webui-aria2](https://github.com/ziahamza/webui-aria2)
+> 注意，Aria2 版本，不带 Web UI, 如果有需要可以使用 [ziahamza/webui-aria2](https://github.com/ziahamza/webui-aria2)
 
 ```
+cd /docker/<downloader>/ # 这里进入到你想使用的下载器的目录里
+
 cat << EOF > .env
 DOWNLOAD_PATH=/arai2_downloads
 BANGUMI_CONFIG=/bangumi_config
@@ -95,8 +98,6 @@ DOWNLOAD_CONFIG=/bt_config
 GID=${GID}
 UID=${UID}
 EOF
-
-cd /docker/<downloader>/ # 这里进入到你想使用的下载器的目录里
 
 docker compose up
 ```

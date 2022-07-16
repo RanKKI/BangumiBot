@@ -10,7 +10,7 @@ from .transmission import TransmissionDownloader
 
 def build_downloader() -> Downloader:
 
-    client_type = os.environ.get(Env.CLIENT_TYPE.value, None)
+    client_type = os.environ.get(Env.CLIENT_TYPE.value, "").lower()
     host = os.environ.get(Env.CLIENT_IP.value, None)
     port = os.environ.get(Env.CLIENT_PORT.value, None)
     username = os.environ.get(Env.CLIENT_USERNAME.value, None)

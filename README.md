@@ -12,7 +12,7 @@
 
 提供高自定义操作，可以自己写插件支持本项目不支持的 RSS 站点，甚至支持非 RSS 站点
 
-[](./images/img_1.jpg)[](./images/img_2.jpg)
+<img src="/images/img_1.jpg" width=30% /> <img src="/images/img_2.jpg" width=50% />
 
 ## Feature
  - RSS

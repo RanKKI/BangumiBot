@@ -12,6 +12,8 @@
 
 提供高自定义操作，可以自己写插件支持本项目不支持的 RSS 站点，甚至支持非 RSS 站点
 
+[](./images/img_1.jpg)[](./images/img_2.jpg)
+
 ## Feature
  - RSS
    - [蜜柑计划](https://mikanani.me/)
@@ -164,8 +166,8 @@ extra_hosts:
 
 ## TODO
  - 语言选择的优先级
- - ~~Docker~~
  - 保种
+ - ~~Docker~~
  - ~~更新提示~~
  - ~~Transmission 支持~~
  - ~~RSS 配置~~

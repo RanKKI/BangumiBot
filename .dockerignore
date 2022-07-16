@@ -2,6 +2,9 @@
 config_example/
 tests/
 README.md
+images/
+docker/
+docs/
 
 # Ignore git
 .github

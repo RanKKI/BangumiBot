@@ -44,7 +44,6 @@ class Notification(object):
 
         return result
 
-
     def call_http(self, url: str, title: str, **kwargs):
         method = kwargs.get("method", "GET")
         data = kwargs.get("data", {})

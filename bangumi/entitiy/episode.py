@@ -11,7 +11,6 @@ class TitleInfo:
         self.raw: str = None
         self.name: str = None
         self.official: str = None
-        self.group: list = None
 
 
 @dataclass

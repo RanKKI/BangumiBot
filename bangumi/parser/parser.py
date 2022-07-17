@@ -5,9 +5,10 @@
 协议: MIT
 """
 
+from functools import reduce
 import logging
 import re
-from typing import Union
+from typing import List, Union
 
 from bangumi.entitiy import Episode
 
@@ -19,7 +20,7 @@ TITLE_RE = re.compile(
 )
 RESOLUTION_RE = re.compile(r"1080|720|2160|4K")
 SOURCE_RE = re.compile(r"B-Global|[Bb]aha|[Bb]ilibili|AT-X|Web")
-SUB_RE = re.compile(r"[简繁日字幕]|CH|BIG5|GB")
+SUB_RE = re.compile(r"字幕|CH|BIG5|GB|简体|繁體|繁体|简")
 
 CHINESE_NUMBER_MAP = {
     "一": 1,
@@ -35,6 +36,21 @@ CHINESE_NUMBER_MAP = {
 }
 
 
+def is_valid_parentheses(s: str) -> bool:
+    """
+    判断字符串是否是合法的括号
+    """
+    stack = []
+    for c in s:
+        if c == "(":
+            stack.append(c)
+        elif c == ")":
+            if len(stack) == 0:
+                return False
+            stack.pop()
+    return len(stack) == 0
+
+
 class Parser:
     @staticmethod
     def get_group(name: str) -> str:
@@ -42,7 +58,12 @@ class Parser:
 
     @staticmethod
     def pre_process(raw_name: str) -> str:
-        return raw_name.replace("【", "[").replace("】", "]")
+        return (
+            raw_name.replace("【", "[")
+            .replace("】", "]")
+            .replace("（", "(")
+            .replace("）", ")")
+        )
 
     @staticmethod
     def __season_process(season_info: str):
@@ -72,26 +93,84 @@ class Parser:
 
     @staticmethod
     def __name_process(name: str):
-        name = name.strip()
-        split = re.split(r"/|\s{2}|-\s{2}", name.replace("（仅限港澳台地区）", ""))
-        while "" in split:
-            split.remove("")
-        if len(split) == 1:
-            if re.search("_{1}", name) is not None:
-                split = re.split("_", name)
-            elif re.search(" - {1}", name) is not None:
-                split = re.split("-", name)
-        if len(split) == 1:
-            match_obj = re.match(r"([^\x00-\xff]{1,})(\s)([\x00-\xff]{4,})", name)
-            if match_obj is not None:
-                return match_obj.group(3), split
-        compare, compare_idx = 0, 0
-        for idx, name in list(enumerate(split)):
-            l = re.findall("[aA-zZ]{1}", name).__len__()
-            if l > compare:
-                compare = l
-                compare_idx = idx
-        return split[compare_idx].strip(), split
+        name = name.strip().replace("  ", " ")
+        name = re.sub(r"\({0,1}(仅|僅)限港澳台地(区|區)\){0,1}", "", name)
+        # remove year in the end
+        name = re.sub(r"(\d{4}\s*)*$", "", name)
+
+        # 删除日期
+        name = re.sub(r"\d{4}年\d{1,2}月", "", name)
+
+        """
+        "[动漫萌][4月新番][Spy  X Family ][BIG5][06][1080P](字幕组招募内详)"
+        针对当字幕出现在集数之前的情况，
+        字幕信息会被认为是标题信息
+        因此删除
+        """
+        for sub in SUB_RE.findall(name):
+            name = name.replace(sub, "")
+
+        NON_CJK = "[^\u4e00-\u9fa5\u30a0-\u30ff\u3040-\u309f]"
+
+        possible_names = set()
+        patterns = ["( - )", "/"]
+        for pattern in patterns:
+            for result in re.split(pattern, name):
+                if not result:
+                    continue
+                possible_names.add(result)
+
+            sub_result = [re.split(pattern, name or "") for name in possible_names]
+            for result in reduce(lambda x, y: x + y, sub_result, []):
+                if not result:
+                    continue
+                possible_names.add(result)
+
+        possible_names = list(filter(lambda x: x, possible_names))
+
+        split_names = list(filter(lambda x: x != name, possible_names))
+
+        possible_names = [
+            re.findall(rf"[^\w]*({NON_CJK}+)[^\w]*", name) for name in possible_names
+        ]
+
+        possible_names = reduce(lambda x, y: x + y, possible_names, [])
+        possible_names = map(lambda x: x.strip(), possible_names)
+
+        """
+        拍脑子定的, 最长的名字必须大于 3 个字符，
+        [ANi]  神渣☆偶像 - 01 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]
+        格式化出来是 ['☆'] 因此需要过滤
+        """
+        possible_names = filter(lambda x: len(x) > 3, possible_names)
+        possible_names = list(possible_names)
+
+        def key(x: str):
+            rank = len(x)
+            if not "-" in x and not "/" in x:
+                return rank
+            if "-" in x:
+                return rank - 10
+            if "/" in x:
+                return rank - 15
+            return rank
+
+        possible_names.sort(key=key, reverse=True)
+
+        ret = None
+
+        if possible_names:
+            ret = possible_names[0]
+        elif split_names:
+            ret = max(split_names, key=len)
+
+        if ret:
+            if ret.count("_") == 1:
+                ret = max(ret.split("_"), key=len)
+            if not is_valid_parentheses(ret):
+                ret = ret.strip("()")
+            ret = ret.strip("-\\.,[] _/\u200b")
+        return ret or name.strip()
 
     @staticmethod
     def find_tags(other):
@@ -124,9 +203,9 @@ class Parser:
             map(lambda x: x.strip(), match_obj.groups())
         )
         raw_name, season_raw, season = Parser.__season_process(season_info)  # 处理 第n季
-        name, name_group = "", ""
+        name = ""
         try:
-            name, name_group = Parser.__name_process(raw_name)  # 处理 名字
+            name = Parser.__name_process(raw_name)  # 处理 名字
         except ValueError:
             pass
         # 处理 集数
@@ -135,7 +214,7 @@ class Parser:
         if raw_episode is not None:
             episode = int(raw_episode.group())
         sub, dpi, source = Parser.find_tags(other)  # 剩余信息处理
-        return name, season, season_raw, episode, sub, dpi, source, name_group, group
+        return name, season, season_raw, episode, sub, dpi, source, group
 
     @staticmethod
     def parse_bangumi_name(raw_title: str) -> Union[Episode, None]:
@@ -143,7 +222,7 @@ class Parser:
             ret = Parser.__process(raw_title)
             if ret is None:
                 return None
-            name, season, sr, episode, sub, dpi, source, ng, group = ret
+            name, season, sr, episode, sub, dpi, source, group = ret
         except Exception as e:
             logger.error(f"ERROR match {raw_title} {e}")
             return None
@@ -152,6 +231,5 @@ class Parser:
         info.season_info.number, info.season_info.raw = season, sr
         info.ep_info.number = episode
         info.subtitle, info.dpi, info.source = sub, dpi, source
-        info.title_info.group = ng
         info.group = group
         return info

@@ -4,6 +4,7 @@ import logging
 from bangumi import BangumiBackgroundTask, app
 from bangumi.database import redisDB
 from bangumi.downloader import downloader
+from bangumi.parser.parser import Parser
 from bangumi.util import init_folders, setup_env, setup_logger
 
 logger = logging.getLogger(__name__)

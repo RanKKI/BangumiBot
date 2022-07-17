@@ -2,7 +2,7 @@ FROM python:3.10-alpine
 
 WORKDIR /src
 
-RUN apk add build-base libxml2-dev libxslt-dev curl
+RUN apk add --no-cache build-base libxml2-dev libxslt-dev curl
 
 # DO NOT EDIT
 # USER NEEDS MOUNT TO THESE DIRECTORY

@@ -64,8 +64,10 @@ class Bangumi(object):
 
     @safe_call
     async def check(self, last_dt: int):
-        logger.info("Checking RSS...")
+        logger.debug("Checking RSS...")
         items = await self.rss.scrape(last_dt)
+        if not items:
+            return
         logger.info("Found %d items", len(items))
         redisDB.add_to_torrent_queue(items)
 
@@ -87,13 +89,14 @@ class Bangumi(object):
     @safe_call
     def check_queue(self):
         logger.debug("Checking torrent queue...")
-        count = 0
+        count, failed_count = 0, 0
         while True:
             item = redisDB.pop_torrent_to_download()
             if not item:
                 break
             info = Parser.parse_bangumi_name(item.name)
             if not info:
+                failed_count += 1
                 logger.error(f"Failed to parse {item.name}")
                 continue
 
@@ -104,16 +107,20 @@ class Bangumi(object):
             try:
                 downloader.add_torrent(item.url)
             except Exception as e:
+                failed_count += 1
                 logger.error(f"Failed to add torrent {e}")
                 redisDB.add_to_torrent_queue(item)
                 continue
 
             redisDB.set_downloaded(info.formatted)
-            logger.info(f"Added {item.url} to downloader")
+            logger.info(f"Added [{info.formatted}] to downloader")
             count += 1
 
         if count > 0:
-            logger.info("Added %d torrents to downloader", count)
+            logger.info(f"Added {count} torrents to downloader")
+
+        if failed_count > 0:
+            logger.error(f"Failed to add {failed_count} torrents to downloader")
 
     async def loop(self):
         INTERVAL = int(os.environ.get(Env.CHECK_INTERVAL.value, 60 * 10))

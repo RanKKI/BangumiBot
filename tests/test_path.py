@@ -25,12 +25,12 @@ class TestRawParser(unittest.TestCase):
 
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第二季 Komi-san wa, Komyushou Desu. S02】【22】【GB_MP4】【1920X1080】"
         episode = Parser.parse_bangumi_name(title)
-        self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu/Season 2/Komi-san wa, Komyushou Desu S02E22.mp4")
+        self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu./Season 2/Komi-san wa, Komyushou Desu. S02E22.mp4")
 
 
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第十季 Komi-san wa, Komyushou Desu. S10】【201】【GB_MP4】【1920X1080】"
         episode = Parser.parse_bangumi_name(title)
-        self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu/Season 10/Komi-san wa, Komyushou Desu S10E201.mp4")
+        self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu./Season 10/Komi-san wa, Komyushou Desu. S10E201.mp4")
 
     def test_move_file(self):
 

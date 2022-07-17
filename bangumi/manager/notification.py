@@ -23,17 +23,27 @@ class Notification(object):
 
     def call(self, title: str):
         logger.info(f"Send notification: {title}")
-        for callback_raw in self.callbacks:
-            callback = callback_raw
-            if isinstance(callback_raw, dict):
-                callback = callback_raw["url"]
+        result = []
+        for callback in self.callbacks:
+            ext = {}
+
+            if isinstance(callback, dict):
+                ext = callback
+                callback = callback.pop("url")
+
+            r = None
             try:
                 if callback.startswith("http"):
-                    self.call_http(callback, title=title, **callback_raw)
+                    r = self.call_http(callback, title=title, **ext)
                 elif os.path.exists(callback):
-                    self.call_script(callback, title)
+                    r = self.call_script(callback, title)
             except Exception as e:
                 logger.error(f"Failed to call {callback}: {e}")
+
+            result.append(r)
+
+        return result
+
 
     def call_http(self, url: str, title: str, **kwargs):
         method = kwargs.get("method", "GET")

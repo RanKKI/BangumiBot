@@ -120,6 +120,8 @@ class Parser:
         content_title = Parser.pre_process(raw_title)  # 预处理标题
         group = Parser.get_group(content_title)  # 翻译组的名字
         match_obj = TITLE_RE.match(content_title)  # 处理标题
+        if not match_obj:
+            raise ValueError("正则匹配失败")
         season_info, episode_info, other = list(
             map(lambda x: x.strip(), match_obj.groups())
         )

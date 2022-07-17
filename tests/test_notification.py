@@ -11,12 +11,20 @@ class TestRawParser(unittest.TestCase):
         return super().setUp()
 
     def test_http_call(self):
-        ret = Notification().call_http(
-            "https://httpbin.org/post",
-            "this is a title",
-            **{"method": "POST", "data": {"body": "12321321"}},
-        )
-        data = json.loads(ret)
+        no = Notification()
+        no.callbacks = [
+            "https://httpbin.org/get",
+            {
+                "url": "https://httpbin.org/post",
+                "method": "POST",
+                "data": {"body": "12321321"},
+            }
+        ]
+        ret = no.call("this is a title")
+
+        self.assertEqual(len(ret), 2)
+
+        data = json.loads(ret[1])
         data = json.loads(data.get("data", "{}"))
 
         self.assertEqual(data.get("body"), "12321321")

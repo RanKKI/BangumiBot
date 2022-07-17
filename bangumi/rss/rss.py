@@ -5,6 +5,7 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
+from time import time
 from typing import Dict, List, Union
 
 from bangumi.entitiy import RSSSite, WaitDownloadItem
@@ -13,6 +14,7 @@ from bangumi.util import (
     filter_download_item_by_rules,
     dynamic_get_class,
     from_dict_to_dataclass,
+    rebuild_url,
 )
 
 from .dmhy import DMHYRSS
@@ -83,6 +85,8 @@ class RSS(object):
         return None
 
     async def scrape_url(self, url: str) -> List[WaitDownloadItem]:
+        # 增加时间戳，避免缓存
+        url = rebuild_url(url, {"_t": int(time())})
         logger.debug(f"scraping url {url}")
         items = []
         parser = self.__get_parser(url)
@@ -97,7 +101,7 @@ class RSS(object):
         items = parser.parse(content)
         if not items:
             return []
-        if not isinstance(items[0], WaitDownloadItem):
+        if isinstance(items[0], dict):
             items = [from_dict_to_dataclass(WaitDownloadItem, data) for data in items]
         items = self.filter_by_duplicate(items)
         return items

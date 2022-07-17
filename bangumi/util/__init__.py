@@ -12,6 +12,7 @@ from .rss import filter_download_item_by_rules
 from .clz import from_dict_to_dataclass
 from .plugin import dynamic_get_class
 from .datetime import get_timestamp
+from .url import rebuild_url
 
 
 def init_folders():

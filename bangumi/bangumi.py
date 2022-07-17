@@ -185,7 +185,8 @@ class BangumiBackgroundTask(threading.Thread):
     def run(self):
         try:
             self.bangumi.run()
-        except:
+        except Exception as e:
+            logger.exception(e)
             os._exit(1)
 
     def stop(self, *args, **kwargs):

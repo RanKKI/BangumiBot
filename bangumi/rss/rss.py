@@ -140,6 +140,9 @@ class RSS(object):
 
         for item in items:
             info = Parser.parse_bangumi_name(item.name)
+            if not info:
+                logger.error(f"Failed to parse bangumi name: {item.name}")
+                continue
             seen[info.formatted].append((item, info.dpi))
 
         dpi_arr = "720|1080|2160|4K".split("|")

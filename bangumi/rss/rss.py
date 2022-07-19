@@ -6,7 +6,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 from time import time
-from typing import Dict, List, Union
+from typing import Dict, List, Set, Union
 
 from bangumi.entitiy import RSSSite, WaitDownloadItem
 from bangumi.parser import Parser
@@ -31,6 +31,7 @@ class RSS(object):
         self.rules = [
             # 正则表达式，会过滤结果
         ]
+        self.failed_hash: Set[str] = set()
 
     def load_config(self, config_path: str) -> None:
         if not os.path.exists(config_path):
@@ -87,7 +88,7 @@ class RSS(object):
     async def scrape_url(self, url: str) -> List[WaitDownloadItem]:
         # 增加时间戳，避免缓存
         url = rebuild_url(url, {"_t": int(time())})
-        logger.debug(f"scraping url {url}")
+        logger.debug(f"Scraping url {url}")
         items = []
         parser = self.__get_parser(url)
         if not parser:
@@ -139,11 +140,14 @@ class RSS(object):
         seen = defaultdict(lambda: [])
 
         for item in items:
-            info = Parser.parse_bangumi_name(item.name)
-            if not info:
-                logger.error(f"Failed to parse bangumi name: {item.name}")
+            if item.hash in self.failed_hash:
                 continue
-            seen[info.formatted].append((item, info.dpi))
+            try:
+                info = Parser.parse_bangumi_name(item.name)
+                seen[info.formatted].append((item, info.dpi))
+            except ValueError:
+                logger.error(f"Failed to parse bangumi name: {item.name}")
+                self.failed_hash.add(item.hash)
 
         dpi_arr = "720|1080|2160|4K".split("|")
 

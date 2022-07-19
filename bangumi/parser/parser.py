@@ -147,8 +147,7 @@ class Parser:
                 return None
             name, season, sr, episode, sub, dpi, source, ng, group = ret
         except Exception as e:
-            logger.error(f"ERROR match {raw_title} {e}")
-            return None
+            raise ValueError(f"解析失败 {e}")
         info = Episode()
         info.title = name
         info.season_info.number, info.season_info.raw = season, sr

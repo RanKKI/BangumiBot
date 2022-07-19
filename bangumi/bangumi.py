@@ -46,9 +46,9 @@ class Bangumi(object):
             logger.error(f"File {file} doesn't exist")
             return
 
-        result = Parser.parse_bangumi_name(info.name)
-        logger.info(f"Renaming {file.name} to {result.formatted}")
         try:
+            result = Parser.parse_bangumi_name(info.name)
+            logger.info(f"Renaming {file.name} to {result.formatted}")
             move_file(file, result)
             return result.formatted
         except Exception as e:
@@ -94,8 +94,10 @@ class Bangumi(object):
             item = redisDB.pop_torrent_to_download()
             if not item:
                 break
-            info = Parser.parse_bangumi_name(item.name)
-            if not info:
+
+            try:
+                info = Parser.parse_bangumi_name(item.name)
+            except ValueError:
                 failed_count += 1
                 logger.error(f"Failed to parse {item.name}")
                 continue

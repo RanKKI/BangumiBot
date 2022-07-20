@@ -15,23 +15,23 @@ class TestRawParser(unittest.TestCase):
         items = [
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][1080p][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][720p][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[10][1080x1920][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[10][4K][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[9][1080][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
             ),
         ]
         items = rss.filter_by_duplicate(items)
@@ -50,27 +50,27 @@ class TestRawParser(unittest.TestCase):
         items = [
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][1080p][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=10,
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][720p][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=15,
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[10][1080x1920][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=15,
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[10][4K][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=20,
             ),
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[9][1080][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=20,
             ),
         ]
@@ -84,17 +84,17 @@ class TestRawParser(unittest.TestCase):
         items = [
             WaitDownloadItem(
                 name="【喵萌奶茶屋】★04月新番★夏日重现/Summer Time Rendering[11][1080p][繁日双语][招募翻译] [539.4 MB]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=10,
             ),
             WaitDownloadItem(
                 name="【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第二季 Komi-san wa, Komyushou Desu. S02】【22】【GB_MP4】【1920X1080】",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=15,
             ),
             WaitDownloadItem(
                 name="[爱恋&漫猫字幕组][4月新番][间谍过家家][SPY × FAMILY][12][1080p][MP4][简中]",
-                url="",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
                 pub_at=15,
             ),
         ]

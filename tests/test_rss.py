@@ -1,5 +1,7 @@
 import unittest
 
+from fastapi import Path
+
 from bangumi.rss import RSS
 from bangumi.entitiy import WaitDownloadItem
 from bangumi.util import setup_test_env, filter_download_item_by_rules
@@ -9,6 +11,9 @@ class TestRawParser(unittest.TestCase):
     def setUp(self) -> None:
         setup_test_env()
         return super().setUp()
+
+    def test_config(self):
+        RSS().load_config(str("./config_example/rss.json"))
 
     def test_order(self):
         rss = RSS()

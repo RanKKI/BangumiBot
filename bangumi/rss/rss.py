@@ -61,6 +61,9 @@ class RSS(object):
             return
         classes = parser.get("classes", [])
         logger.info(f"Loading parser plugin {folder} {classes}")
+        if not os.path.exists(folder):
+            logger.error(f"Failed to find parser plugin folder: {folder}")
+            return
         clz_objects = dynamic_get_class(Path(folder), classes)
         self.__parsers.extend([clz() for clz in clz_objects])
 
@@ -73,7 +76,7 @@ class RSS(object):
                     break
             if not matched:
                 logger.error(f"Failed to match url: {site.url}")
-                self.sites.remove(site.url)
+                self.sites.remove(site)
                 continue
             # get url domain
             logger.info(

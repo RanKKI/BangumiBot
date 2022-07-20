@@ -90,6 +90,7 @@ class Bangumi(object):
     def check_queue(self):
         logger.debug("Checking torrent queue...")
         count, failed_count = 0, 0
+        failed_added = []
         while True:
             item = redisDB.pop_torrent_to_download()
             if not item:
@@ -109,9 +110,8 @@ class Bangumi(object):
             try:
                 downloader.add_torrent(item.url)
             except Exception as e:
-                failed_count += 1
+                failed_added.append(item)
                 logger.error(f"Failed to add torrent {e}")
-                redisDB.add_to_torrent_queue(item)
                 continue
 
             redisDB.set_downloaded(info.formatted)
@@ -123,6 +123,10 @@ class Bangumi(object):
 
         if failed_count > 0:
             logger.error(f"Failed to add {failed_count} torrents to downloader")
+
+        if failed_added:
+            redisDB.add_to_torrent_queue(failed_added)
+            logger.info(f"Added {len(failed_added)} failed torrents to queue")
 
     async def loop(self):
         INTERVAL = int(os.environ.get(Env.CHECK_INTERVAL.value, 60 * 10))

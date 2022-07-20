@@ -37,7 +37,9 @@ class RSS(object):
         if not os.path.exists(config_path):
             return
         with open(config_path, "r") as f:
-            data = json.load(f)
+            # using .encode('unicode_escape') to avoid regular expression error
+            data = json.load(f.encode('unicode_escape'))
+
         for url in data.get("urls", []):
             site: RSSSite = None
             if isinstance(url, str):

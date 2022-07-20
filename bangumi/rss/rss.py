@@ -85,7 +85,9 @@ class RSS(object):
                 return parser
         return None
 
-    async def scrape_url(self, url: str) -> List[WaitDownloadItem]:
+    async def scrape_url(
+        self, url: str, last_scrape_time: int = 0
+    ) -> List[WaitDownloadItem]:
         # 增加时间戳，避免缓存
         url = rebuild_url(url, {"_t": int(time())})
         logger.debug(f"Scraping url {url}")
@@ -104,6 +106,7 @@ class RSS(object):
             return []
         if isinstance(items[0], dict):
             items = [from_dict_to_dataclass(WaitDownloadItem, data) for data in items]
+        items = self.filter_by_time(items, last_scrape_time)
         items = self.filter_by_duplicate(items)
         return items
 
@@ -114,7 +117,7 @@ class RSS(object):
         items = []
 
         for site in self.sites:
-            ret = await self.scrape_url(site.url)
+            ret = await self.scrape_url(site.url, last_scrape_time=last_scrape_time)
             items += filter_download_item_by_rules(site.rules, ret)
 
         items = self.filter_by_time(items, last_scrape_time)

@@ -130,7 +130,7 @@ class Bangumi(object):
             logger.info(f"Added {len(failed_added)} failed torrents to queue")
 
     async def loop(self):
-        INTERVAL = int(os.environ.get(Env.CHECK_INTERVAL.value, 60 * 10))
+        INTERVAL = Env.get(Env.CHECK_INTERVAL, 60 * 10, type=int)
 
         while self.is_running:
             current = int(time())
@@ -144,7 +144,7 @@ class Bangumi(object):
 
     def init(self):
         logger.info("init...")
-        media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
+        media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
         exists = set()
         for item in glob(str(media / "**/*"), recursive=True):
             if not os.path.isfile(item):
@@ -156,7 +156,7 @@ class Bangumi(object):
             redisDB.set_downloaded(name)
 
     def load_config(self):
-        config_folder = Path(os.environ.get(Env.CONFIG_PATH.value, "/config"))
+        config_folder = Env.get(Env.CONFIG_PATH, "/config", type=Path)
         rss_config = config_folder / "rss.json"
         if rss_config.exists():
             self.rss.load_config(rss_config)
@@ -176,7 +176,7 @@ class Bangumi(object):
             logger.info("")
 
         def env(key: Env, default=""):
-            return os.environ.get(key.value, default)
+            return Env.get(key, default, type=str)
 
         table = [
             ["Log Level", env(Env.LOGGER_LEVEL)],

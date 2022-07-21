@@ -1,4 +1,7 @@
 from enum import Enum
+import os
+from pathlib import Path
+from typing import Union
 
 PREFIX = "BANGUMI_"
 
@@ -23,3 +26,16 @@ class Env(Enum):
     CONFIG_PATH = PREFIX + "CONFIG_PATH"
 
     LOGGER_LEVEL = PREFIX + "LOGGER_LEVEL"
+
+    @staticmethod
+    def get(key: "Env", default="", *, type: Union[str, bool, int, Path] = str) -> str:
+        val = os.environ.get(key.value, default)
+        if type == str:
+            return val
+        if type == int:
+            return int(val)
+        if type == bool:
+            return val.lower() in ["yes", "true", "1"]
+        if type == Path:
+            return Path(val)
+        raise ValueError(f"Unknown type: {type}")

@@ -54,7 +54,7 @@ class Episode:
         return f"{self.title} S{season}E{ep}"
 
     def get_full_path(self, ext: str = "") -> Path:
-        media = Path(os.environ.get(Env.MEDIA_FOLDER.value, "media"))
+        media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
         return (
             media
             / Path(self.title)

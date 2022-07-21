@@ -48,8 +48,7 @@ class RSS(object):
             self.sites.append(site)
 
         self.rules = data.get("rules", [])
-        for rule in self.rules:
-            logger.info(f"Loaded rule: {rule}")
+
         for parser in data.get("parsers", []):
             self.__load_parser(parser)
 
@@ -80,10 +79,10 @@ class RSS(object):
                 continue
             # get url domain
             logger.info(
-                f"Matched url: {site.url[:32]}... {inspect.getfile(parser.__class__)}"
+                f"Matched url: {site.chop_url(35)} {str(parser)}"
             )
 
-    def __get_parser(self, url: str) -> RSSParser:
+    def get_parser(self, url: str) -> RSSParser:
         for parser in self.__parsers:
             if parser.is_matched(url):
                 return parser
@@ -96,7 +95,7 @@ class RSS(object):
         url = rebuild_url(url, {"_t": int(time())})
         logger.debug(f"Scraping url {url}")
         items = []
-        parser = self.__get_parser(url)
+        parser = self.get_parser(url)
         if not parser:
             logger.error(f"Failed to get parser for url: {url}")
             return []
@@ -172,3 +171,21 @@ class RSS(object):
             ret.append(val[0][0])
 
         return ret
+
+    def as_table(self):
+        table = []
+        for i, rule in enumerate(self.rules):
+            if i == 0:
+                table.append(["*", rule])
+            else:
+                table.append(["", rule])
+        for site in self.sites:
+            if not site.rules:
+                table.append([site.chop_url(35), ""])
+                continue
+            for i, rule in enumerate(site.rules):
+                if i == 0:
+                    table.append([site.chop_url(35), rule])
+                else:
+                    table.append(["", rule])
+        return table

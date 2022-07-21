@@ -75,3 +75,19 @@ class Notification(object):
             return check_output(cmd)
         logger.debug(f"Call: {cmd}")
         check_call(cmd, stdout=DEVNULL, stderr=STDOUT)
+
+    def as_table(self):
+        table = []
+        for callback in self.callbacks:
+            ext = {}
+            if isinstance(callback, dict):
+                ext = callback
+                callback = callback.pop("url")
+
+            if callback.startswith("http"):
+                table.append(["HTTP", ext.get("method", "GET"), callback])
+            else:
+                table.append(["SHELL", "", callback])
+
+        return table
+

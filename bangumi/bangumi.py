@@ -8,6 +8,7 @@ from pathlib import Path
 from time import sleep, time
 
 import requests
+from tabulate import tabulate
 
 from bangumi.database import redisDB
 from bangumi.downloader import DownloadState, downloader
@@ -167,12 +168,53 @@ class Bangumi(object):
         else:
             logger.info("No notification config found, Skip...")
 
+    def print_config(self):
+        def print(r):
+            for line in r.splitlines():
+                logger.info(line)
+            logger.info("")
+            logger.info("")
+
+        def env(key: Env, default=""):
+            return os.environ.get(key.value, default)
+
+        table = [
+            ["Log Level", env(Env.LOGGER_LEVEL)],
+            ["Client", env(Env.CLIENT_TYPE)],
+            [
+                "Client Addr",
+                f"{env(Env.CLIENT_USERNAME)}:{env(Env.CLIENT_PASSWORD)}@{env(Env.CLIENT_IP)}:{env(Env.CLIENT_PORT)}",
+            ],
+            ["Redis", f"{env(Env.REDIS_PASSWORD)}@{env(Env.REDIS_HOST)}:{env(Env.REDIS_PORT)}"],
+            ["Check", env(Env.CHECK_INTERVAL)],
+            ["Download", env(Env.DOWNLOAD_FOLDER)],
+            ["Cache", env(Env.CACHE_FOLDER)],
+            ["Media", env(Env.MEDIA_FOLDER)],
+            ["Config", env(Env.CONFIG_PATH)],
+        ]
+        r = tabulate(table, headers=["Env", ""], tablefmt="simple")
+        print(r)
+
+        r = tabulate(
+            self.rss.as_table(), headers=["RSS Site", "Rules"], tablefmt="simple"
+        )
+        print(r)
+
+        logger.info("Notification")
+        r = tabulate(
+            self.notification.as_table(),
+            headers=["Type", "Method", "URi"],
+            tablefmt="simple",
+        )
+        print(r)
+
     def run(self):
         self.is_running = True
         logger.info("Starting...")
         self.load_config()
         if redisDB.init():
             self.init()
+        self.print_config()
         asyncio.run(self.loop())
 
     def stop(self):

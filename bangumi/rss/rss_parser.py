@@ -1,3 +1,4 @@
+import inspect
 import logging
 from abc import ABC, abstractmethod
 from typing import List
@@ -24,3 +25,6 @@ class RSSParser(ABC):
     @abstractmethod
     def parse(self, content: bs4.BeautifulSoup) -> List[WaitDownloadItem]:
         raise NotImplementedError()
+
+    def __str__(self) -> str:
+        return inspect.getfile(self.__class__)

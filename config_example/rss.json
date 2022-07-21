@@ -1,10 +1,11 @@
 {
     "urls": [
-        "https://bangumi.moe/rss/latest",
+        "https://mikanani.me/rss/latest",
         {
             "url": "https://dmhy.org/topics/rss/rss.xml",
             "rules": [
-                ".*[^(來自深淵)|(来自深渊)].*"
+                ".*[^(來自深淵)|(来自深渊)].*",
+                ".*21321*"
             ]
         }
     ],

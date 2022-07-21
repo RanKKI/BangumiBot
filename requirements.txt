@@ -1,3 +1,4 @@
+anitopy==2.1.0
 anyio==3.6.1
 appdirs==1.4.4
 aria2p==0.11.2
@@ -30,6 +31,7 @@ six==1.16.0
 sniffio==1.2.0
 soupsieve==2.3.2.post1
 starlette==0.19.1
+tabulate==0.8.10
 toml==0.10.2
 tomli==2.0.1
 transmission-rpc==3.3.2

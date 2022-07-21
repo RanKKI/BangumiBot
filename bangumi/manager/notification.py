@@ -90,4 +90,3 @@ class Notification(object):
                 table.append(["SHELL", "", callback])
 
         return table
-

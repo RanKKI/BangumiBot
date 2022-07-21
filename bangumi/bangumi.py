@@ -185,7 +185,10 @@ class Bangumi(object):
                 "Client Addr",
                 f"{env(Env.CLIENT_USERNAME)}:{env(Env.CLIENT_PASSWORD)}@{env(Env.CLIENT_IP)}:{env(Env.CLIENT_PORT)}",
             ],
-            ["Redis", f"{env(Env.REDIS_PASSWORD)}@{env(Env.REDIS_HOST)}:{env(Env.REDIS_PORT)}"],
+            [
+                "Redis",
+                f"{env(Env.REDIS_PASSWORD)}@{env(Env.REDIS_HOST)}:{env(Env.REDIS_PORT)}",
+            ],
             ["Check", env(Env.CHECK_INTERVAL)],
             ["Download", env(Env.DOWNLOAD_FOLDER)],
             ["Cache", env(Env.CACHE_FOLDER)],

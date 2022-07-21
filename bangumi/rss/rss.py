@@ -78,9 +78,7 @@ class RSS(object):
                 self.sites.remove(site)
                 continue
             # get url domain
-            logger.info(
-                f"Matched url: {site.chop_url(35)} {str(parser)}"
-            )
+            logger.info(f"Matched url: {site.chop_url(35)} {str(parser)}")
 
     def get_parser(self, url: str) -> RSSParser:
         for parser in self.__parsers:

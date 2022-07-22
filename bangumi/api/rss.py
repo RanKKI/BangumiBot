@@ -1,4 +1,5 @@
 from bangumi.database import redisDB
+from bangumi.entitiy import RSSSite
 from bangumi.rss import RSS
 from pydantic import BaseModel
 
@@ -11,6 +12,6 @@ class AddRss(BaseModel):
 
 @api.post("/add_by_rss")
 async def add_torrents_by_rss(r: AddRss):
-    items = await RSS().scrape_url(r.url)
+    items = await RSS().scrape_url(RSSSite(url=r.url))
     redisDB.add_to_torrent_queue(items)
     return {"message": "OK!", "items": items}

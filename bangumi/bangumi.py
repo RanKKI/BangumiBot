@@ -117,11 +117,13 @@ class Bangumi(object):
                 redisDB.remove(item.hash)
                 continue
 
-            try:
-                downloader.add_torrent(item.url)
-            except Exception as e:
+            success_added = downloader.add_torrent(item.url)
+
+            if not success_added:
                 failed_added.append(item)
-                logger.error(f"Failed to add torrent {e}")
+                logger.error(
+                    f"Failed to add torrent {info.formatted}, will retry later"
+                )
                 continue
 
             redisDB.set_downloaded(info.formatted)

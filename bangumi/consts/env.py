@@ -47,6 +47,7 @@ class Env(Enum):
     def as_table():
         def env(key: Env, default=""):
             return Env.get(key, default, type=str)
+
         return [
             ["Log Level", env(Env.LOGGER_LEVEL)],
             ["Client", env(Env.CLIENT_TYPE)],

@@ -217,7 +217,7 @@ class Bangumi(object):
 
         if self.rss.mapper:
             logger.info("RSS Mapper:")
-        for a,b in self.rss.mapper:
+        for a, b in self.rss.mapper:
             logger.info(f"┌ {a}")
             logger.info(f"└ {b}")
         if self.rss.mapper:

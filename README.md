@@ -27,6 +27,7 @@
    - Aria2
    - qBittorrent
    - Transmission
+ - 支持下载后保种
 
 ## 使用指南
 
@@ -113,6 +114,12 @@ extra_hosts:
 ```
 
 ## 配置
+### Env
+```
+BANGUMI_LOGGER_LEVEL = "INFO"  # 日志等级，保持在 INFO 即可
+BANGUMI_SEEDING = [1|yes|true] # 均表示下载完成后不删除下载器记录，持续保种（建议开启）
+```
+
 ### RSS
 注意过滤的 `rules`，如果**命中**则会被**舍去**。**并非只下载命中资源**
 ```
@@ -166,7 +173,7 @@ extra_hosts:
 
 ## TODO
  - 语言选择的优先级
- - 保种
+ - ~~保种~~
  - ~~Docker~~
  - ~~更新提示~~
  - ~~Transmission 支持~~

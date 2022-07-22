@@ -217,8 +217,4 @@ class RSS(object):
                     table.append([site.chop_url(35), rule])
                 else:
                     table.append(["", rule])
-        if self.mapper:
-            table.append(["", ""])
-            for map_from, map_to in self.mapper:
-                table.append([map_from, map_to])
         return table

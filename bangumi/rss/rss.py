@@ -6,7 +6,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 from time import time
-from typing import Dict, List, Set, Union
+from typing import Dict, Iterable, List, Set, Union
 
 from bangumi.entitiy import RSSSite, WaitDownloadItem
 from bangumi.parser import Parser
@@ -32,12 +32,15 @@ class RSS(object):
             # 正则表达式，会过滤结果
         ]
         self.failed_hash: Set[str] = set()
+        self.mapper: List[str] = []
 
     def load_config(self, config_path: str) -> None:
         if not os.path.exists(config_path):
             return
         with open(config_path, "r") as f:
             data = json.load(f)
+
+        self.mapper = data.get("mapper", [])
 
         for url in data.get("urls", []):
             site: RSSSite = None
@@ -53,6 +56,7 @@ class RSS(object):
             self.__load_parser(parser)
 
         self.__validate_parser()
+        self.__validate_mapper()
 
     def __load_parser(self, parser: Dict[str, Union[str, List[str]]]) -> None:
         folder = parser.get("folder", None)
@@ -67,7 +71,8 @@ class RSS(object):
         self.__parsers.extend([clz() for clz in clz_objects])
 
     def __validate_parser(self):
-        for site in self.sites:
+        sites = self.sites[:]
+        for site in sites:
             matched = False
             for parser in self.__parsers:
                 if parser.is_matched(site.url):
@@ -79,6 +84,15 @@ class RSS(object):
                 continue
             # get url domain
             logger.info(f"Matched url: {site.chop_url(35)} {str(parser)}")
+
+    def __validate_mapper(self):
+        mapper = self.mapper[:]
+        for item in mapper:
+            invalid = not isinstance(item, Iterable)
+            invalid = invalid or len(item) != 2
+            if invalid:
+                logger.error(f"Invalid title mapper: {item}")
+                self.mapper.remove(item)
 
     def get_parser(self, url: str) -> RSSParser:
         for parser in self.__parsers:
@@ -107,6 +121,7 @@ class RSS(object):
             return []
         if isinstance(items[0], dict):
             items = [from_dict_to_dataclass(WaitDownloadItem, data) for data in items]
+        items = self.map_title(items)
         items = self.filter_by_time(items, last_scrape_time)
         items = self.filter_by_duplicate(items)
         return items
@@ -124,6 +139,22 @@ class RSS(object):
         items = self.filter_by_time(items, last_scrape_time)
         items = filter_download_item_by_rules(self.rules, items)
         items = self.filter_by_duplicate(items)
+        return items
+
+    def map_title(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
+        for item in items:
+            for matcher, result in self.mapper:
+                ret = re.match(matcher, item.name)
+                if not ret:
+                    continue
+                val = ret.groups()
+                try:
+                    old_name = item.name
+                    item.name = result.format(*val)
+                    logger.debug(f"Mapped title from {old_name} to {item.name}")
+                except Exception as e:
+                    logger.error(f"Failed to format name {item.name} {val} {e}")
+                break
         return items
 
     def filter_by_time(
@@ -186,4 +217,8 @@ class RSS(object):
                     table.append([site.chop_url(35), rule])
                 else:
                     table.append(["", rule])
+        if self.mapper:
+            table.append(["", ""])
+            for map_from, map_to in self.mapper:
+                table.append([map_from, map_to])
         return table

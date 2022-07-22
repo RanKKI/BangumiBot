@@ -146,6 +146,9 @@ BANGUMI_SEEDING = [1|yes|true] # 均表示下载完成后不删除下载器记�
                 "another-parser-name"
             ]
         }
+    ],
+    "mapper": [ # mapper 是对名字的预处理，以防存在不符合预期的名字导致无法解析
+      ["^\[ANi\] 即使如此依旧步步进逼（仅限港澳台地区） - (\d+) (\[.*\]\s*)+", "Soredemo Ayumu wa Yosetekuru - {} {}"]
     ]
 }
 ```

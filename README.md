@@ -117,7 +117,7 @@ extra_hosts:
 ### Env
 ```
 BANGUMI_LOGGER_LEVEL = "INFO"  # 日志等级，保持在 INFO 即可
-BANGUMI_SEEDING = [1|yes|true] # 均表示下载完成后不删除下载器记录，持续保种（建议开启）
+BANGUMI_SEEDING = [1|yes|true] # 均表示下载完成后不删除下载器记录，持续保种
 ```
 
 ### RSS
@@ -170,6 +170,14 @@ BANGUMI_SEEDING = [1|yes|true] # 均表示下载完成后不删除下载器记�
     "/bin/script" # 脚本通知, 第一个参数为格式化后的名字
 ]
 ```
+
+## 注意事项
+### 保种
+BANGUMI_SEEDING 保种选项，在 Docker 里无法使用，因为一些限制无法创建文件链接。
+
+大致原因是 Linux 限制了跨文件系统的硬链接，即便是同一个文件系统，但是不同的 `mount points` 也无法使用。因此想要在 Docker 内实现保种功能，只能将文件保存两份。
+
+详情见 [How to create hard link to file in a docker volume](https://stackoverflow.com/questions/55380443/how-to-create-hard-link-to-file-in-a-docker-volume)
 
 ## TODO
  - 语言选择的优先级

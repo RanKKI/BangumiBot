@@ -33,7 +33,6 @@ class TestRawParser(unittest.TestCase):
         self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Komi-san wa, Komyushou Desu./Season 10/Komi-san wa, Komyushou Desu. S10E201.mp4")
 
     def test_move_file(self):
-
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第十季 Komi-san wa, Komyushou Desu. S10】【201】【GB_MP4】【1920X1080】"
         episode = Parser.parse_bangumi_name(title)
 
@@ -45,4 +44,20 @@ class TestRawParser(unittest.TestCase):
         path = episode.get_full_path()
         self.assertTrue(os.path.exists(path))
         with open(path, "r") as f:
+            self.assertEqual(f.read(), val)
+
+    def test_move_file_with_link(self):
+        title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第十季 Komi-san wa, Komyushou Desu. S10】【201】【GB_MP4】【1920X1080】"
+        episode = Parser.parse_bangumi_name(title)
+
+        val = str(random())
+        filename = self.cache_path / Path("test")
+        with open(filename, "w") as f:
+            f.write(val)
+        move_file(filename, episode, reverse_link=True)
+        path = episode.get_full_path()
+        self.assertTrue(os.path.exists(path))
+        with open(path, "r") as f:
+            self.assertEqual(f.read(), val)
+        with open(filename, "r") as f:
             self.assertEqual(f.read(), val)

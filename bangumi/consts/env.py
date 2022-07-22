@@ -27,6 +27,9 @@ class Env(Enum):
 
     LOGGER_LEVEL = PREFIX + "LOGGER_LEVEL"
 
+    # 是否持续做种
+    SEEDING = PREFIX + "SEEDING"
+
     @staticmethod
     def get(key: "Env", default="", *, type: Union[str, bool, int, Path] = str) -> str:
         val = os.environ.get(key.value, default)

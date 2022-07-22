@@ -88,6 +88,12 @@ class RedisDB(object):
             return
         self.client.set(f"file:{key}", 1)
 
+    def is_seeding(self, _hash: str) -> bool:
+        return self.client.get(f"seeding:{_hash}")
+
+    def set_seeding(self, _hash: str) -> None:
+        self.client.set(f"seeding:{_hash}", 1)
+
     def init(self) -> bool:
         if self.client.get("initd"):
             return False

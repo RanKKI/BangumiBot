@@ -10,15 +10,18 @@ def get_relative_path(path: Path) -> Path:
     """
     获取相对路径
     """
-    download_folder = Path(os.environ.get(Env.DOWNLOAD_FOLDER.value, "downloads"))
+    download_folder = Env.get(Env.DOWNLOAD_FOLDER, "downloads", type=Path)
     return download_folder / path.name
 
 
-def move_file(file: Path, result: Episode) -> None:
+def move_file(file: Path, result: Episode, *, reverse_link=False) -> None:
     ext = os.path.splitext(file.name)[1]
     target_file = result.get_full_path(ext=ext)
     target_file.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(file, target_file)
+
+    if reverse_link:
+        os.link(target_file, file)
 
 
 def setup_test_env() -> Path:

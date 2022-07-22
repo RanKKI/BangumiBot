@@ -50,8 +50,9 @@ class Bangumi(object):
         try:
             result = Parser.parse_bangumi_name(info.name)
             logger.info(f"Renaming {file.name} to {result.formatted}")
-            move_file(file, result)
-            return result.formatted
+            seeding = Env.get(Env.SEEDING, False, type=bool)
+            move_file(file, result, reverse_link=seeding)
+            return result.formatted, seeding
         except Exception as e:
             logger.error(f"Failed to rename {e}")
 
@@ -59,9 +60,13 @@ class Bangumi(object):
         ret = self.rename(item, redisDB.get(item.hash))
         if not ret:
             return
+        title, seeding = ret
         redisDB.remove(item.hash)
-        downloader.remove_torrent(item)
-        self.notification.call(ret)
+        if seeding:
+            redisDB.set_seeding(item.hash)
+        else:
+            downloader.remove_torrent(item)
+        self.notification.call(title)
 
     @safe_call
     async def check(self, last_dt: int):
@@ -83,6 +88,10 @@ class Bangumi(object):
 
         if len(completed) == 0:
             return
+
+        # 过滤标记为做种的已完成项目
+        completed = [item for item in completed if not redisDB.is_seeding(item.hash)]
+
         logger.info("Found %d completed downloads", len(completed))
         for item in completed:
             self.on_torrent_finished(item)
@@ -155,6 +164,28 @@ class Bangumi(object):
         for name in exists:
             redisDB.set_downloaded(name)
 
+        """
+        恢复 Redis 中的正在做种的项目
+        """
+        if Env.get(Env.SEEDING, False, type=bool):
+            try:
+                completed = downloader.get_downloads(DownloadState.FINISHED)
+            except requests.exceptions.ConnectionError as e:
+                logger.error(f"Failed to get completed torrents {e}")
+                return
+
+            for item in completed:
+                try:
+                    info = Parser.parse_bangumi_name(item.name)
+                except ValueError:
+                    logger.error(f"Failed to parse {item.name}")
+                    continue
+                """
+                已经被转移到 media 目录，但还存在于下载器中（且是已完成项目），认为是正在做种的项目
+                """
+                if redisDB.is_downloaded(info.formatted):
+                    redisDB.set_seeding(item.hash)
+
     def load_config(self):
         config_folder = Env.get(Env.CONFIG_PATH, "/config", type=Path)
         rss_config = config_folder / "rss.json"
@@ -194,6 +225,7 @@ class Bangumi(object):
             ["Cache", env(Env.CACHE_FOLDER)],
             ["Media", env(Env.MEDIA_FOLDER)],
             ["Config", env(Env.CONFIG_PATH)],
+            ["Seeding", Env.get(Env.SEEDING, False, type=bool)],
         ]
         r = tabulate(table, headers=["Env", ""], tablefmt="simple")
         print(r)

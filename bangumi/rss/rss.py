@@ -1,5 +1,3 @@
-import inspect
-import json
 import logging
 import os
 import re
@@ -8,14 +6,15 @@ from pathlib import Path
 from time import time
 from typing import Dict, Iterable, List, Set, Union
 
-from bangumi.entitiy import RSSSite, WaitDownloadItem
+from bangumi.entitiy import Configurable, RSSSite, WaitDownloadItem
 from bangumi.parser import Parser
 from bangumi.util import (
-    filter_download_item_by_rules,
     dynamic_get_class,
+    filter_download_item_by_rules,
     from_dict_to_dataclass,
     rebuild_url,
 )
+from tabulate import tabulate
 
 from .dmhy import DMHYRSS
 from .mikan import MiKanRSS
@@ -24,22 +23,23 @@ from .rss_parser import RSSParser
 logger = logging.getLogger(__name__)
 
 
-class RSS(object):
+class RSS(Configurable):
     def __init__(self) -> None:
         self.__parsers: List[RSSParser] = [MiKanRSS(), DMHYRSS()]
         self.sites: List[RSSSite] = []
-        self.rules = [
-            # 正则表达式，会过滤结果
-        ]
+        self.rules = []  # 正则表达式，会过滤结果
         self.failed_hash: Set[str] = set()
         self.mapper: List[str] = []
 
-    def load_config(self, config_path: str) -> None:
-        if not os.path.exists(config_path):
-            return
-        with open(config_path, "r") as f:
-            data = json.load(f)
+    def reset_config(self):
+        self.__parsers: List[RSSParser] = [MiKanRSS(), DMHYRSS()]
+        self.sites: List[RSSSite] = []
+        self.rules = []  # 正则表达式，会过滤结果
+        self.failed_hash: Set[str] = set()
+        self.mapper: List[str] = []
 
+    def load_config(self, data) -> None:
+        self.reset_config()
         self.mapper = data.get("mapper", [])
 
         for url in data.get("urls", []):
@@ -57,6 +57,8 @@ class RSS(object):
 
         self.__validate_parser()
         self.__validate_mapper()
+
+        self.log_config()
 
     def __load_parser(self, parser: Dict[str, Union[str, List[str]]]) -> None:
         folder = parser.get("folder", None)
@@ -201,7 +203,7 @@ class RSS(object):
 
         return ret
 
-    def as_table(self):
+    def log_config(self):
         table = []
         for i, rule in enumerate(self.rules):
             if i == 0:
@@ -217,4 +219,15 @@ class RSS(object):
                     table.append([site.chop_url(35), rule])
                 else:
                     table.append(["", rule])
-        return table
+        string = tabulate(table, headers=["RSS Site", "Rules"], tablefmt="simple")
+        for line in string.splitlines():
+            logger.info(line)
+        logger.info("")
+
+        if self.mapper:
+            logger.info("RSS Mapper:")
+        for a, b in self.mapper:
+            logger.info(f"┌ {a}")
+            logger.info(f"└ {b}")
+        if self.mapper:
+            logger.info("")

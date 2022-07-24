@@ -5,21 +5,20 @@ import shlex
 from subprocess import DEVNULL, STDOUT, check_call, check_output
 from typing import List
 
+from bangumi.entitiy import Configurable
 from requests.utils import requote_uri
+from tabulate import tabulate
 
 logger = logging.getLogger(__name__)
 
 
-class Notification(object):
+class Notification(Configurable):
     def __init__(self) -> None:
         self.callbacks: List[str] = []
 
-    def load_config(self, config_path: str):
-        if not os.path.exists(config_path):
-            return
-        with open(config_path, "r") as f:
-            data = json.load(f)
+    def load_config(self, data):
         self.callbacks = data
+        self.log_config()
 
     def call(self, title: str):
         logger.info(f"Send notification: {title}")
@@ -76,7 +75,7 @@ class Notification(object):
         logger.debug(f"Call: {cmd}")
         check_call(cmd, stdout=DEVNULL, stderr=STDOUT)
 
-    def as_table(self):
+    def log_config(self):
         table = []
         for callback in self.callbacks:
             ext = {}
@@ -89,4 +88,13 @@ class Notification(object):
             else:
                 table.append(["SHELL", "", callback])
 
-        return table
+        logger.info("Notification")
+        r = tabulate(
+            table,
+            headers=["Type", "Method", "URi"],
+            tablefmt="simple",
+        )
+
+        for line in r.splitlines():
+            logger.info(line)
+        logger.info("")

@@ -13,7 +13,7 @@ class TestRawParser(unittest.TestCase):
         return super().setUp()
 
     def test_config(self):
-        RSS().load_config(str("./config_example/rss.json"))
+        RSS().load_config({})
 
     def test_order(self):
         rss = RSS()

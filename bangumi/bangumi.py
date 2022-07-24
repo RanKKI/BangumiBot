@@ -13,7 +13,7 @@ from tabulate import tabulate
 from bangumi.database import redisDB
 from bangumi.downloader import DownloadState, downloader
 from bangumi.entitiy import DownloadItem, WaitDownloadItem
-from bangumi.manager import Notification
+from bangumi.manager import ConfigManager, Notification
 from bangumi.parser import Parser
 from bangumi.rss import RSS
 from bangumi.util import Env, get_relative_path, move_file, safe_call
@@ -26,6 +26,7 @@ class Bangumi(object):
         super().__init__()
         self.rss = RSS()
         self.notification = Notification()
+        self.config = ConfigManager()
         self.is_running = False
 
     def rename(self, item: DownloadItem, info: WaitDownloadItem) -> str:
@@ -189,47 +190,15 @@ class Bangumi(object):
                     redisDB.set_seeding(item.hash)
 
     def load_config(self):
-        config_folder = Env.get(Env.CONFIG_PATH, "/config", type=Path)
-        rss_config = config_folder / "rss.json"
-        if rss_config.exists():
-            self.rss.load_config(rss_config)
-        else:
-            logger.info("No RSS config found, Skip...")
-        notification_config = config_folder / "notification.json"
-        if notification_config.exists():
-            self.notification.load_config(notification_config)
-        else:
-            logger.info("No notification config found, Skip...")
+        self.config.register("rss.json", self.rss)
+        self.config.register("notification.json", self.notification)
+        self.config.start_listener()
 
-    def print_config(self):
-        def print(r):
-            for line in r.splitlines():
-                logger.info(line)
-            logger.info("")
-
+    def log_env(self):
         r = tabulate(Env.as_table(), headers=["Env", ""], tablefmt="simple")
-        print(r)
-
-        r = tabulate(
-            self.rss.as_table(), headers=["RSS Site", "Rules"], tablefmt="simple"
-        )
-        print(r)
-
-        if self.rss.mapper:
-            logger.info("RSS Mapper:")
-        for a, b in self.rss.mapper:
-            logger.info(f"┌ {a}")
-            logger.info(f"└ {b}")
-        if self.rss.mapper:
-            logger.info("")
-
-        logger.info("Notification")
-        r = tabulate(
-            self.notification.as_table(),
-            headers=["Type", "Method", "URi"],
-            tablefmt="simple",
-        )
-        print(r)
+        for line in r.splitlines():
+            logger.info(line)
+        logger.info("")
 
     def run(self):
         self.is_running = True
@@ -237,12 +206,13 @@ class Bangumi(object):
         self.load_config()
         if redisDB.init():
             self.init()
-        self.print_config()
+        self.log_env()
         asyncio.run(self.loop())
 
     def stop(self):
         logger.info("Stopping...")
         self.is_running = False
+        self.config.stop_listener()
 
 
 class BangumiBackgroundTask(threading.Thread):

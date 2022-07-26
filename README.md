@@ -14,6 +14,8 @@
 
 <img src="/images/img_1.jpg" width=30% /> <img src="/images/img_2.jpg" width=50% />
 
+> 图一是 Jellyfin 家的原生 iOS 客户端 [Swiftfin](https://github.com/jellyfin/Swiftfin) (还在 Testflight 中)，图二的通知是 [Bark](https://github.com/Finb/Bark)，一个通过 http 发送 iOS 通知的软件
+
 ## Feature
  - RSS
    - [蜜柑计划](https://mikanani.me/)

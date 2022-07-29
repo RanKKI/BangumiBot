@@ -124,7 +124,7 @@ class RSS(Configurable):
         if isinstance(items[0], dict):
             items = [from_dict_to_dataclass(WaitDownloadItem, data) for data in items]
         items = self.map_title(items)
-        items = self.filter_by_time(items, last_scrape_time)
+        # items = self.filter_by_time(items, last_scrape_time)
         items = filter_download_item_by_rules(self.rules, items)
         items = filter_download_item_by_rules(site.rules, items)
         items = self.filter_by_duplicate(items)
@@ -139,7 +139,7 @@ class RSS(Configurable):
         for site in self.sites:
             items += await self.scrape_url(site, last_scrape_time=last_scrape_time)
 
-        items = self.filter_by_time(items, last_scrape_time)
+        # items = self.filter_by_time(items, last_scrape_time)
         items = self.filter_by_duplicate(items)
         return items
 

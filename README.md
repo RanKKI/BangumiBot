@@ -5,7 +5,7 @@
 
 <img src="/images/img_1.jpg" width=30% /> <img src="/images/img_2.jpg" width=50% />
 
-> The first app is the official iOS client from Jellyfin, called [Swiftfin](https://github.com/jellyfin/Swiftfin) (Still under Testflight)，The second app called [Bark](https://github.com/Finb/Bark) which allows sending notification to your iPhone by HTTP request
+> The first app is the official Jellyfin iOS client [Swiftfin](https://github.com/jellyfin/Swiftfin) (Still under Testflight)，The second app [Bark](https://github.com/Finb/Bark) which allows sending notification to your iPhone by HTTP request
 
 ## Feature
  - RSS

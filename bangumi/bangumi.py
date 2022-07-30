@@ -3,8 +3,6 @@ import logging
 import os
 import signal
 import threading
-from glob import glob
-from pathlib import Path
 from time import sleep, time
 
 import requests
@@ -16,6 +14,7 @@ from bangumi.entitiy import DownloadItem, WaitDownloadItem
 from bangumi.manager import ConfigManager, Notification
 from bangumi.parser import Parser
 from bangumi.rss import RSS
+from bangumi.shared import refresh_local
 from bangumi.util import Env, get_relative_path, move_file, safe_call
 
 logger = logging.getLogger(__name__)
@@ -154,41 +153,6 @@ class Bangumi(object):
             self.check_queue()
             sleep(30)
 
-    def init(self):
-        logger.info("init...")
-        media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
-        exists = set()
-        for item in glob(str(media / "**/*"), recursive=True):
-            if not os.path.isfile(item):
-                continue
-            name, _ = os.path.splitext(os.path.basename(item))
-            exists.add(name)
-        logger.info("Found %d files that already downloaded", len(exists))
-        for name in exists:
-            redisDB.set_downloaded(name)
-
-        """
-        恢复 Redis 中的正在做种的项目
-        """
-        if Env.get(Env.SEEDING, False, type=bool):
-            try:
-                completed = downloader.get_downloads(DownloadState.FINISHED)
-            except requests.exceptions.ConnectionError as e:
-                logger.error(f"Failed to get completed torrents {e}")
-                return
-
-            for item in completed:
-                try:
-                    info = Parser.parse_bangumi_name(item.name)
-                except ValueError:
-                    logger.error(f"Failed to parse {item.name}")
-                    continue
-                """
-                已经被转移到 media 目录，但还存在于下载器中（且是已完成项目），认为是正在做种的项目
-                """
-                if redisDB.is_downloaded(info.formatted):
-                    redisDB.set_seeding(item.hash)
-
     def load_config(self):
         self.config.register("rss.json", self.rss)
         self.config.register("notification.json", self.notification)
@@ -205,7 +169,7 @@ class Bangumi(object):
         logger.info("Starting...")
         self.load_config()
         if redisDB.init():
-            self.init()
+            refresh_local(redisDB, downloader)
         self.log_env()
         asyncio.run(self.loop())
 

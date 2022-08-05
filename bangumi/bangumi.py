@@ -117,7 +117,12 @@ class Bangumi(object):
                 redisDB.remove(item.hash)
                 continue
 
-            success_added = downloader.add_torrent(item.url)
+            try:
+                success_added = downloader.add_torrent(item.url)
+            except Exception as e:
+                success_added = False
+                failed_count += 1
+                logger.error(e)
 
             if not success_added:
                 failed_added.append(item)

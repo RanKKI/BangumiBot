@@ -1,6 +1,7 @@
 import unittest
 
 from bangumi.parser import Parser
+from bangumi.entitiy import Episode
 
 
 class TestRawParser(unittest.TestCase):
@@ -172,7 +173,7 @@ class TestRawParser(unittest.TestCase):
             ("【极影字幕社】 ★4月新番 【间谍过家家】【SPY×FAMILY】【09】GB MP4_720P", "SPY×FAMILY", "极影字幕社", 9, 1),
             ("【悠哈璃羽字幕社】 [處刑少女的生存之道__Shokei-Shoujo-no-Virgin-Road] [12] [x264 1080p][CHT]", "Shokei-Shoujo-no-Virgin-Road", "悠哈璃羽字幕社", 12, 1),
             ("[ANi] Birdie Wing Golf Girls Story -  小鳥之翼 - 13 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]", "Birdie Wing Golf Girls Story", "ANi", 13, 1),
-            ("[NC-Raws] 小鸟之翼 高尔夫少女 / Birdie Wing: Golf Girls' Story - 13 (B-Global 1920x1080 HEVC AAC MKV)", "Birdie Wing: Golf Girls' Story", "NC-Raws", 13, 1),
+            ("[NC-Raws] 小鸟之翼 高尔夫少女 / Birdie Wing: Golf Girls' Story - 13 (B-Global 1920x1080 HEVC AAC MKV)", "Birdie Wing Golf Girls' Story", "NC-Raws", 13, 1),
             ("[爱恋&漫猫字幕组][4月新番][社畜小姐想被幼女幽灵治愈][Ms. Corporate Slave Wants to be Healed by a Loli Spirit, Shachisaretai][12][1080p][MP4][简中]", "Ms. Corporate Slave Wants to be Healed by a Loli Spirit, Shachisaretai", "爱恋&漫猫字幕组", 12, 1),
             ("【喵萌奶茶屋】★04月新番★[处刑少女的生存之道/処刑少女の生きる道/Shokei Shoujo no Virgin Road][10][WebRip 1080p HEVC-10bit AAC][简繁内封][招募翻译校对]", "Shokei Shoujo no Virgin Road", "喵萌奶茶屋", 10, 1),
             ("[桜都字幕組] 間諜家家酒 / Spy x Family [12v2][1080p][繁體內嵌]", "Spy x Family", "桜都字幕組", 12, 1),
@@ -202,7 +203,7 @@ class TestRawParser(unittest.TestCase):
             ("【千夏字幕組】【測不準的阿波連同學 / 不會拿捏距離的阿波連同學_Aharen-san wa Hakarenai】[第12話][1080p_AVC][繁體][完]", "不會拿捏距離的阿波連同學_Aharen-san wa Hakarenai", "千夏字幕組", 12, 1),
             ("【千夏字幕组】【测不准的阿波连同学 / 不会拿捏距离的阿波连同学_Aharen-san wa Hakarenai】[第12话][1080p_AVC][简体][完]", "不会拿捏距离的阿波连同学_Aharen-san wa Hakarenai", "千夏字幕组", 12, 1),
             ("【悠哈璃羽字幕社】[青之蘆葦_Ao Ashi][12][x264 1080p][CHT]", "Ao Ashi", "悠哈璃羽字幕社", 12, 1),
-            ("[桜都字幕组] 街角魔族 2丁目 / Machikado Mazoku: 2-choume  [11][1080P][简繁内封]", "Machikado Mazoku: 2-choume", "桜都字幕组", 11, 1),
+            ("[桜都字幕组] 街角魔族 2丁目 / Machikado Mazoku: 2-choume  [11][1080P][简繁内封]", "Machikado Mazoku 2-choume", "桜都字幕组", 11, 1),
             ("[Skymoon-Raws] 這個僧侶有夠煩 / Kono Healer Mendokusai - 12 [ViuTV][WEB-DL][1080p][AVC AAC][繁體外掛][MP4+ASS](正式版本)", "Kono Healer Mendokusai", "Skymoon-Raws", 12, 1),
             ("[LoliHouse] 这个医师超麻烦 / 這個僧侶有夠煩 / Kono Healer, Mendokusai - 12 [WebRip 1080p HEVC-10bit AAC][简繁内封字幕][End]", "Kono Healer, Mendokusai", "LoliHouse", 12, 1),
             ("[风车字幕组][名侦探柯南][1046][天谴降临生日派对（后篇）][1080P][简体][MP4]", "名侦探柯南", "风车字幕组", 1046, 1),
@@ -214,7 +215,7 @@ class TestRawParser(unittest.TestCase):
             ("[NC-Raws] 时空之隙 / Rift - 12 (B-Global Donghua 1920x1080 HEVC AAC MKV)", "Rift", "NC-Raws", 12, 1),
             ("[雪飘工作室][Delicious Party Precure/デリシャスパーティ プリキュア][WEBDL][1080p][16][简繁外挂](检索:光之美少女/Q娃) 偶活网番已交稿明后恢复", "Delicious Party Precure", "雪飘工作室", 16, 1),
             ("[雪飘工作室][ワッチャプリマジ！/Whatcha _Pri-maji!/哇恰美妙魔法！][36][简](检索:/美妙旋律/美妙天堂/美妙频道) 偶活网番已交稿明后恢复", "Whatcha _Pri-maji!", "雪飘工作室", 36, 1),
-            ("[NC-Raws] 博人传之火影忍者次世代 / Boruto: Naruto Next Generations - 255 (B-Global 1920x1080 HEVC AAC MKV)", "Boruto: Naruto Next Generations", "NC-Raws", 255, 1),
+            ("[NC-Raws] 博人传之火影忍者次世代 / Boruto: Naruto Next Generations - 255 (B-Global 1920x1080 HEVC AAC MKV)", "Boruto Naruto Next Generations", "NC-Raws", 255, 1),
             ("[悠哈璃羽字幕社] [國王排名_Ousama Ranking] [23] [x264 1080p] [CHT]", "Ousama Ranking", "悠哈璃羽字幕社", 23, 1),
             ("[虹咲学园烤肉同好会][Love Live! 虹咲学园学园偶像同好会 第二季][13END][简日内嵌][特效歌词][WebRip][1080p][AVC AAC MP4]", "Love Live! 虹咲学园学园偶像同好会", "虹咲学园烤肉同好会", 13, 2),
             ("[桜都字幕组] 盾之勇者成名录 Season2 / Tate no Yuusha no Nariagari Season2 [12][1080P][简繁内封]", "Tate no Yuusha no Nariagari Season2", "桜都字幕组", 12, 1),
@@ -247,7 +248,7 @@ class TestRawParser(unittest.TestCase):
             ("[NC-Raws] 名侦探柯南 / Detective Conan - 1105 (B-Global 1920x1080 HEVC AAC MKV)", "Detective Conan", "NC-Raws", 1105, 1),
             ("【極影字幕社】LoveLive！ 虹咲學園學園偶像同好會 第2期 第12集 BIG5 AVC 1080p", "LoveLive！ 虹咲學園學園偶像同好會", "極影字幕社", 12, 2),
             ("[梦蓝字幕组]Crayonshinchan 蜡笔小新[1136][2022.06.18][AVC][1080P][GB_JP]V2", "Crayonshinchan 蜡笔小新", "梦蓝字幕组", 1136, 1),
-            ("[梦蓝字幕组]New Doraemon 哆啦A梦新番[711][2022.06.18][AVC][1080P][GB_JP]", "New Doraemon ", "梦蓝字幕组", 711, 1),
+            ("[梦蓝字幕组]New Doraemon 哆啦A梦新番[711][2022.06.18][AVC][1080P][GB_JP]", "New Doraemon", "梦蓝字幕组", 711, 1),
             ("[ANi]  街角的魔族女孩 第二季（僅限港澳台地區） - 11 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]", "街角的魔族女孩 （僅限港澳台地區）", "ANi", 11, 2),
             ("【喵萌Production】★04月新番★[歌愈少女/Healer Girl][12][1080p][简日双语][招募翻译]", "Healer Girl", "喵萌Production", 12, 1),
             ("[Skymoon-Raws] 輝夜姬想讓人告白 一超級浪漫一 / Kaguya-sama wa Kokurasetai S03 - 13 [ViuTV][WEB-DL][1080p][AVC AAC][繁體外掛][MP4+ASS](正式版本)", "Kaguya-sama wa Kokurasetai", "Skymoon-Raws", 13, 3),
@@ -257,14 +258,14 @@ class TestRawParser(unittest.TestCase):
             ("[冷番补完][明日之丈2剧场版][あしたのジョー２][Ashita no joe 2 Movie][1981][BDRip][1080P]", "Ashita no joe 2 Movie", "冷番补完", 1981, 1),
             ("[LoliHouse] 雀魂 PONG / Jongtama PONG - 11 [WebRip 1080p HEVC-10bit AAC]", "Jongtama PONG", "LoliHouse", 11, 1),
             ("[c.c動漫][4月新番][約會大作戰 第四季][12][BIG5][1080P][MP4][END]", "約會大作戰", "c.c動漫", 12, 4),
-            ("[ANi]  約會大作戰 DATE A LIVE 第四季（僅限港澳台地區） - 12 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]", "DATE A LIVE ", "ANi", 12, 4),
+            ("[ANi]  約會大作戰 DATE A LIVE 第四季（僅限港澳台地區） - 12 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]", "DATE A LIVE", "ANi", 12, 4),
             ("[NC-Raws] 约会大作战 第四季 / Date A Live S4 - 12 (B-Global 1920x1080 HEVC AAC MKV)", "Date A Live", "NC-Raws", 12, 4),
             ("[ANi] Love After World Domination -  愛在征服世界後 - 12 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]", "Love After World Domination", "ANi", 12, 1),
             ("【悠哈璃羽字幕社】[86 -不存在的戰區- / Eighty Six][23][x264 1080p][CHT]", "Eighty Six", "悠哈璃羽字幕社", 23, 1),
-            (r"[波洛咖啡厅\PCSUB][相合之物\Deaimon][04][简日\CHS_JP][1080P][MP4_AAC][网盘][招翻译]", r"相合之物\Deaimon", r"波洛咖啡厅\PCSUB", 4, 1),
+            (r"[波洛咖啡厅\PCSUB][相合之物\Deaimon][04][简日\CHS_JP][1080P][MP4_AAC][网盘][招翻译]", r"相合之物 Deaimon", r"波洛咖啡厅\PCSUB", 4, 1),
             ("[酷漫404][間諜家家酒][11][1080P][WebRip][繁日雙語][AVC AAC][MP4][字幕組招人內詳]", "間諜家家酒", "酷漫404", 11, 1),
             ("[酷漫404][间谍过家家][11][1080P][WebRip][简日双语][AVC AAC][MP4][字幕组招人内详]", "间谍过家家", "酷漫404", 11, 1),
-            ("[NC-Raws] 假面騎士劇場版 對決！超越新世代 [電影] / Kamen Rider: Beyond Generations - 01 (Baha 1920x1080 AVC AAC MP4)", "Kamen Rider: Beyond Generations", "NC-Raws", 1, 1),
+            ("[NC-Raws] 假面騎士劇場版 對決！超越新世代 [電影] / Kamen Rider: Beyond Generations - 01 (Baha 1920x1080 AVC AAC MP4)", "Kamen Rider Beyond Generations", "NC-Raws", 1, 1),
             ("[桜都字幕组] RPG不动产 / RPG Fudousan [12][1080P][简繁内封]", "RPG Fudousan", "桜都字幕组", 12, 1),
             ("[c.c動漫][4月新番][成為女主角！~被討厭的女主角和秘密的工作~][12][BIG5][1080P][MP4][END]", "成為女主角！~被討厭的女主角和秘密的工作~", "c.c動漫", 12, 1),
             ("[Lilith-Raws] 骸骨騎士大人異世界冒險中 / Gaikotsu Kishi-sama - 12 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]", "Gaikotsu Kishi-sama", "Lilith-Raws", 12, 1),
@@ -314,7 +315,7 @@ class TestRawParser(unittest.TestCase):
             ("【YWCN字幕组】[妖怪手表♪Youkai Watch♪][36][GB][1920X1080][MP4]", "妖怪手表♪Youkai Watch♪", "YWCN字幕组", 36, 1),
             ("【悠哈璃羽字幕社】[小林家的龍女僕S_Kobayashi-san Chi no Maid Dragon S][13][x264 1080p][CHT]", "Kobayashi-san Chi no Maid Dragon S", "悠哈璃羽字幕社", 13, 1),
             ("[Lilith-Raws] 小書痴的下剋上：為了成為圖書管理員不擇手段！/ Honzuki no Gekokujou - 36 [Baha][WEB-DL][1080p][AVC AAC][CHT][MP4]", "Honzuki no Gekokujou", "Lilith-Raws", 36, 1),
-            ("[ANi]  小書痴的下剋上：為了成為圖書管理員不擇手段！第三季 - 36 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]", "小書痴的下剋上：為了成為圖書管理員不擇手段！", "ANi", 36, 3),
+            ("[ANi]  小書痴的下剋上：為了成為圖書管理員不擇手段！第三季 - 36 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4]", "小書痴的下剋上 為了成為圖書管理員不擇手段！", "ANi", 36, 3),
             ("[桜都字幕组] 3秒后，野兽。～坐在联谊会角落的他是个肉食系 / 3 Byou Go, Yajuu. Goukon de Sumi ni Ita Kare wa Midara na Nikushoku Deshita [08][1080p][简繁内封]", "3 Byou Go, Yajuu. Goukon de Sumi ni Ita Kare wa Midara na Nikushoku Deshita", "桜都字幕组", 8, 1),
             ("[PoInSu] 间谍家家酒 & SPY×FAMILY [09] [2160P] [HEVC 10bit] [英内封]", "& SPY×FAMILY", "PoInSu", 9, 1),
             ("【熔岩动画Sub】街角魔族 2丁目 (第二季) / Machikado Mazoku 2-Choume [09][简日内嵌][1080P][AVC AAC][MP4]", "Machikado Mazoku 2-Choume", "熔岩动画Sub", 9, 2),
@@ -331,3 +332,17 @@ class TestRawParser(unittest.TestCase):
             self.assertEqual(info.group, group)
             self.assertEqual(info.ep_info.number, epi)
             self.assertEqual(info.season_info.number, season)
+
+    def test_title(self):
+        epi = Episode()
+        epi.title = "测试/测试"
+        self.assertEqual(epi.title, "测试 测试")
+
+        epi.title = "测试：测试"
+        self.assertEqual(epi.title, "测试 测试")
+
+        epi.title = "测试：/、、\测试"
+        self.assertEqual(epi.title, "测试 、、 测试")
+
+        epi.title = ":"
+        self.assertEqual(epi.title, "")

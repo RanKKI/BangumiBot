@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from pathlib import Path
+import re
 
 from bangumi.consts.env import Env
 
@@ -30,9 +31,14 @@ class EpisodeInfo:
 
 @dataclass
 class Episode:
+
     @property
     def title(self) -> str:
-        return self.title_info.name
+        # 删除特殊字符
+        ret = re.sub("[/\\\\:\*\"<>|\?：]", " ", self.title_info.name)
+        # 删除多余空格
+        ret = re.sub("\s+", " ", ret)
+        return ret.strip()
 
     @title.setter
     def title(self, title: str):

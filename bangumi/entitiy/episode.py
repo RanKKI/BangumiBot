@@ -31,11 +31,10 @@ class EpisodeInfo:
 
 @dataclass
 class Episode:
-
     @property
     def title(self) -> str:
         # 删除特殊字符
-        ret = re.sub("[/\\\\:\*\"<>|\?：]", " ", self.title_info.name)
+        ret = re.sub('[/\\\\:\*"<>|\?：]', " ", self.title_info.name)
         # 删除多余空格
         ret = re.sub("\s+", " ", ret)
         return ret.strip()

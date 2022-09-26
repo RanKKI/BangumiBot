@@ -58,7 +58,7 @@ class TestRawParser(unittest.TestCase):
         filename = self.cache_path / Path("test")
         with open(filename, "w") as f:
             f.write(val)
-        move_file(filename, episode, reverse_link=True)
+        move_file(filename, episode, seeding=True)
         path = episode.get_full_path()
         self.assertTrue(os.path.exists(path))
         with open(path, "r") as f:

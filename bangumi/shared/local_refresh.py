@@ -28,8 +28,8 @@ def refresh_local(redisDB, downloader):
         redisDB.set_downloaded(name)
 
     """
-        恢复 Redis 中的正在做种的项目
-        """
+    恢复 Redis 中的正在做种的项目
+    """
     if Env.get(Env.SEEDING, False, type=bool):
         try:
             completed = downloader.get_downloads(DownloadState.FINISHED)
@@ -44,7 +44,7 @@ def refresh_local(redisDB, downloader):
                 logger.error(f"Failed to parse {item.name}")
                 continue
             """
-                已经被转移到 media 目录，但还存在于下载器中（且是已完成项目），认为是正在做种的项目
-                """
+            已经被转移到 media 目录，但还存在于下载器中（且是已完成项目），认为是正在做种的项目
+            """
             if redisDB.is_downloaded(info.formatted):
                 redisDB.set_seeding(item.hash)

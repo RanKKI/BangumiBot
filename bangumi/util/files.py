@@ -14,14 +14,20 @@ def get_relative_path(path: Path) -> Path:
     return download_folder / path.name
 
 
-def move_file(file: Path, result: Episode, *, reverse_link=False) -> None:
+def move_file(file: Path, result: Episode, *, seeding=False) -> None:
     ext = os.path.splitext(file.name)[1]
     target_file = result.get_full_path(ext=ext)
     target_file.parent.mkdir(parents=True, exist_ok=True)
-    shutil.move(file, target_file)
-
-    if reverse_link:
-        os.link(target_file, file)
+    # most of cases, the download drive and the storage drive are different
+    # so instead of creating link between two directory, copy the data to
+    # the storage drive and keep the original file in order to seed.
+    # NOTICE: this will cause the file size to be doubled.
+    #         and it's important to set auto-remove when seeding ratio reached or
+    #         no enough spaces
+    if seeding:
+        shutil.copy(file, target_file)
+    else:
+        shutil.move(file, target_file)
 
 
 def setup_test_env() -> Path:

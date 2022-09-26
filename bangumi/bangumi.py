@@ -51,7 +51,7 @@ class Bangumi(object):
             result = Parser.parse_bangumi_name(info.name)
             logger.info(f"Renaming {file.name} to {result.formatted}")
             seeding = Env.get(Env.SEEDING, False, type=bool)
-            move_file(file, result, reverse_link=seeding)
+            move_file(file, result, seeding=seeding)
             return result.formatted, seeding
         except Exception as e:
             logger.error(f"Failed to rename {e}")

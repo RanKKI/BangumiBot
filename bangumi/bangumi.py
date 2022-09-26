@@ -86,11 +86,11 @@ class Bangumi(object):
             logger.error(f"Failed to get completed torrents {e}")
             return
 
-        if len(completed) == 0:
-            return
-
         # 过滤标记为做种的已完成项目
         completed = [item for item in completed if not redisDB.is_seeding(item.hash)]
+
+        if len(completed) == 0:
+            return
 
         logger.info("Found %d completed downloads", len(completed))
         for item in completed:

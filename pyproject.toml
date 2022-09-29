@@ -1,2 +1,31 @@
 [tool.black]
 max-line-length = 88
+
+[tool.poetry]
+name = "bangumi"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8.3"
+pydantic = "^1.10.2"
+redis = "^4.3.4"
+watchdog = "^2.1.9"
+requests = "^2.28.1"
+tabulate = "^0.8.10"
+beautifulsoup4 = "^4.11.1"
+PyYAML = "^6.0"
+fastapi = "^0.85.0"
+uvicorn = "^0.18.3"
+aria2p = "^0.11.2"
+transmission-rpc = "^3.3.2"
+qbittorrent-api = "^2022.8.38"
+pikpakapi = "^0.0.7"
+python-dotenv = "^0.21.0"
+lxml = "^4.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -6,6 +6,7 @@ from .aria2 import Aria2Downloader
 from .downloader import Downloader, DownloadState
 from .qbittorrent import QBittorrentDownloader
 from .transmission import TransmissionDownloader
+from .pikpak import PikpakDownloader
 
 
 def build_downloader() -> Downloader:
@@ -25,6 +26,10 @@ def build_downloader() -> Downloader:
     elif client_type == "transmission":
         return TransmissionDownloader(
             host=host, port=port, username=username, password=password
+        )
+    elif client_type == "pikpak":
+        return PikpakDownloader(
+            username=username, password=password
         )
     raise ValueError("Client type not specified")
 

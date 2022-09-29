@@ -28,9 +28,7 @@ def build_downloader() -> Downloader:
             host=host, port=port, username=username, password=password
         )
     elif client_type == "pikpak":
-        return PikpakDownloader(
-            username=username, password=password
-        )
+        return PikpakDownloader(username=username, password=password)
     raise ValueError("Client type not specified")
 
 

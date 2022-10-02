@@ -27,7 +27,7 @@ RUN mkdir -p \
     /cache \
     /config
 
-COPY . .
+COPY --chmod=755 . .
 
 # API PORT
 EXPOSE 8000

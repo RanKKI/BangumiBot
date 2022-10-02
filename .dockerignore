@@ -1,5 +1,4 @@
 # Ignore useless files
-config_example/
 tests/
 README.md
 images/

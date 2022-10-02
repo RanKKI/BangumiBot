@@ -65,9 +65,4 @@ class Episode:
         season_folder = f"Season {int(season)}"
         if season % 1 == 0.5:
             season_folder += " Part 2"
-        return (
-            media
-            / Path(self.title)
-            / season_folder
-            / f"{self.formatted}{ext}"
-        )
+        return media / Path(self.title) / season_folder / f"{self.formatted}{ext}"

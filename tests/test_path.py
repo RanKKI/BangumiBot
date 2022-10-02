@@ -36,6 +36,10 @@ class TestRawParser(unittest.TestCase):
         episode = Parser.parse_bangumi_name(title)
         self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Made in Abyss Retsujitsu no Ougonkyou/Season 1/Made in Abyss Retsujitsu no Ougonkyou S01E11.mp4")
 
+        title = "[桜都字幕组] 来自深渊 烈日的黄金乡 / Made in Abyss： Retsujitsu no Ougonkyou S1.5 [11][1080p][繁体内嵌] [559.22 MB]"
+        episode = Parser.parse_bangumi_name(title)
+        self.assertEqual(str(episode.get_full_path(".mp4")), ".cache/media/Made in Abyss Retsujitsu no Ougonkyou/Season 1 Part 2/Made in Abyss Retsujitsu no Ougonkyou S01E11.mp4")
+
     def test_move_file(self):
         title = "【幻樱字幕组】【4月新番】【古见同学有交流障碍症 第十季 Komi-san wa, Komyushou Desu. S10】【201】【GB_MP4】【1920X1080】"
         episode = Parser.parse_bangumi_name(title)

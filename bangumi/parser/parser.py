@@ -10,6 +10,7 @@ import re
 from typing import Union
 
 from bangumi.entitiy import Episode
+from functools import reduce
 
 logger = logging.getLogger(__name__)
 
@@ -51,23 +52,21 @@ class Parser:
         else:
             name_season = re.sub(r"^[^]】]*[]】]", "", season_info).strip()
         season_rule = r"S\d{1,2}|Season \d{1,2}|[第].[季期]"
+        season_rule = r"S(\d{1,2}(?:\.5)?)|Season (\d{1,2}(?:\.5)?)|[第](.)[季期]"
         name_season = re.sub(r"[\[\]]", " ", name_season)
         seasons = re.findall(season_rule, name_season)
         if not seasons:
             return name_season, "", 1
         name = re.sub(season_rule, "", name_season)
-        for season in seasons:
+        for season in filter(lambda x: x.strip(), reduce(lambda x, y: x + y, seasons)):
             season_raw = season
-            if re.search(r"S|Season", season) is not None:
-                season = int(re.sub(r"S|Season", "", season))
-                break
-            elif re.search(r"[第 ].*[季期]", season) is not None:
-                season_pro = re.sub(r"[第季期 ]", "", season)
-                try:
-                    season = int(season_pro)
-                except ValueError:
-                    season = CHINESE_NUMBER_MAP[season_pro]
-                    break
+            try:
+                if season.isnumeric():
+                    season = int(season)
+                else:
+                    season = float(season)
+            except ValueError:
+                season = CHINESE_NUMBER_MAP.get(season, 1)
         return name, season_raw, season
 
     @staticmethod

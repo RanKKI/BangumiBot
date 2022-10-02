@@ -16,6 +16,13 @@ class TestRawParser(unittest.TestCase):
         self.assertEqual(info.ep_info.number, 22)
         self.assertEqual(info.season_info.number, 2)
 
+        content = "[织梦字幕组] SPY×FAMILY S1.5 第10集【GB_MP4】【1920X1080】"
+        info = Parser.parse_bangumi_name(content)
+
+        self.assertEqual(info.title, "SPY×FAMILY")
+        self.assertEqual(info.ep_info.number, 10)
+        self.assertEqual(info.season_info.number, 1.5)
+
         content = "[百冬练习组&LoliHouse] BanG Dream! 少女乐团派对！☆PICO FEVER！ / Garupa Pico: Fever! - 26 [WebRip 1080p HEVC-10bit AAC][简繁内封字幕][END] [101.69 MB]"
         info = Parser.parse_bangumi_name(content)
 

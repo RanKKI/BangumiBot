@@ -54,15 +54,20 @@ class Episode:
 
     @property
     def formatted(self) -> str:
-        season = str(self.season_info.number).zfill(2)
+        season = self.season_info.number
+        season = str(int(season)).zfill(2)
         ep = str(self.ep_info.number).zfill(2)
         return f"{self.title} S{season}E{ep}"
 
     def get_full_path(self, ext: str = "") -> Path:
         media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
+        season = self.season_info.number
+        season_folder = f"Season {int(season)}"
+        if season % 1 == 0.5:
+            season_folder += " Part 2"
         return (
             media
             / Path(self.title)
-            / f"Season {self.season_info.number}"
+            / season_folder
             / f"{self.formatted}{ext}"
         )

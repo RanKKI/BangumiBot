@@ -1,13 +1,5 @@
 #!/bin/bash
 
-if [ ! -f "/config/notification.json" ]; then
-    cp /src/config_example/notification.json /config/notification.json
-fi
-
-if [ ! -f "/config/rss.json" ]; then
-    cp /src/config_example/rss.json /config/rss.json
-fi
-
 chown ${PUID}:${PGID} \
     /config \
     /config/rss.json \

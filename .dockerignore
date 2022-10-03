@@ -1,5 +1,6 @@
 # Ignore useless files
 tests/
+config_example/
 README.md
 images/
 docker/

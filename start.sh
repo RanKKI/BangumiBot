@@ -1,10 +1,12 @@
 #!/bin/bash
 
+chown -R ${PUID}:${PGID} \
+    /src
+
 chown ${PUID}:${PGID} \
     /config \
     /config/rss.json \
     /config/notification.json \
-    /src/conf/log.yml \
     /cache \
     /media \
     /downloads

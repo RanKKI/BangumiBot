@@ -219,3 +219,24 @@ class TestRawParser(unittest.TestCase):
             i[2].name,
             "Soredemo Ayumu wa Yosetekuru - 4 [1080P]",
         )
+
+    def test_spaces_with_mapper(self):
+        rss = RSS()
+        items = [
+            WaitDownloadItem(
+                name="[桜都字幕组] 夫妇以上，恋人未满。/   Fuufu Ijou, Koibito Miman. [04][1080p][简繁内封]",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
+                pub_at=10,
+            )
+        ]
+        rss.mapper = [
+            [
+                ".*夫妇以上，恋人未[满満]。/ Fuufu Ijou, Koibito Miman. \[(\d+)\]((\[.*\])*)",
+                "[桜都字幕组] Fuufu Ijou, Koibito Miman 第{}集 {}",
+            ]
+        ]
+        ret = rss.map_title(items)
+        self.assertEqual(
+            ret[0].name,
+            "[桜都字幕组] Fuufu Ijou, Koibito Miman 第04集 [1080p][简繁内封]",
+        )

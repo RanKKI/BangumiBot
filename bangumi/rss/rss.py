@@ -147,7 +147,7 @@ class RSS(Configurable):
     def map_title(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
         def map_title(item: WaitDownloadItem) -> WaitDownloadItem:
             for *matcher, result in self.mapper:
-                name = item.name
+                name = re.sub("\s+", " ", item.name)
                 data = first(matcher, lambda x: re.match(x, name))
                 if not data:
                     continue

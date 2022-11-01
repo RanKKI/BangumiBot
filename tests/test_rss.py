@@ -132,7 +132,10 @@ class TestRawParser(unittest.TestCase):
     def test_mapper(self):
         rss = RSS()
         rss.mapper = [
-            ["^\[ANi\] 即使如此依旧步步进逼（仅限港澳台地区） - (\d+) (\[.*\]\s*)+", "Soredemo Ayumu wa Yosetekuru - {} {}"]
+            [
+                "^\[ANi\] 即使如此依旧步步进逼（仅限港澳台地区） - (\d+) (\[.*\]\s*)+",
+                "Soredemo Ayumu wa Yosetekuru - {} {}",
+            ]
         ]
         items = [
             WaitDownloadItem(
@@ -147,13 +150,72 @@ class TestRawParser(unittest.TestCase):
             ),
         ]
         i = rss.map_title(items)
-        self.assertEqual(i[0].name, "[NaN-Raws]即使如此依旧步步进逼[3][Bilibili][WEB-DL][1080P][AVC_AAC][CHT][MP4][bangumi.online]")
-        self.assertEqual(i[1].name, "Soredemo Ayumu wa Yosetekuru - 03 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]")
+        self.assertEqual(
+            i[0].name,
+            "[NaN-Raws]即使如此依旧步步进逼[3][Bilibili][WEB-DL][1080P][AVC_AAC][CHT][MP4][bangumi.online]",
+        )
+        self.assertEqual(
+            i[1].name,
+            "Soredemo Ayumu wa Yosetekuru - 03 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]",
+        )
 
         rss.mapper = [
-            ["^\[ANi\] 即使如此依旧步步进逼（仅限港澳台地区） - (\d+) (\[.*\]\s*)+", "Soredemo Ayumu wa Yosetekuru - {} {}"],
-            ["^\[NaN-Raws\]即使如此依旧步步进逼\[(\d+)\](\[.*\]\s*)+", "Soredemo Ayumu wa Yosetekuru - {} {}"],
+            [
+                "^\[ANi\] 即使如此依旧步步进逼（仅限港澳台地区） - (\d+) (\[.*\]\s*)+",
+                "Soredemo Ayumu wa Yosetekuru - {} {}",
+            ],
+            [
+                "^\[NaN-Raws\]即使如此依旧步步进逼\[(\d+)\](\[.*\]\s*)+",
+                "Soredemo Ayumu wa Yosetekuru - {} {}",
+            ],
         ]
         i = rss.map_title(items)
-        self.assertEqual(i[0].name, "Soredemo Ayumu wa Yosetekuru - 3 [Bilibili][WEB-DL][1080P][AVC_AAC][CHT][MP4][bangumi.online]")
-        self.assertEqual(i[1].name, "Soredemo Ayumu wa Yosetekuru - 03 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]")
+        self.assertEqual(
+            i[0].name,
+            "Soredemo Ayumu wa Yosetekuru - 3 [Bilibili][WEB-DL][1080P][AVC_AAC][CHT][MP4][bangumi.online]",
+        )
+        self.assertEqual(
+            i[1].name,
+            "Soredemo Ayumu wa Yosetekuru - 03 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]",
+        )
+
+    def test_multiple_mapper(self):
+        rss = RSS()
+        items = [
+            WaitDownloadItem(
+                name="[NaN-Raws]即使如此依旧步步进逼[3][Bilibili][WEB-DL][1080P][AVC_AAC][CHT][MP4][bangumi.online]",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
+                pub_at=10,
+            ),
+            WaitDownloadItem(
+                name="[ANi] 即使如此依旧步步进逼（仅限港澳台地区） - 03 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
+                pub_at=10,
+            ),
+            WaitDownloadItem(
+                name="即使如此依旧步步进逼第4集[1080P]",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
+                pub_at=10,
+            ),
+        ]
+        rss.mapper = [
+            [
+                "^\[ANi\] 即使如此依旧步步进逼（仅限港澳台地区） - (\d+) (\[.*\]\s*)+",
+                "^\[NaN-Raws\]即使如此依旧步步进逼\[(\d+)\](\[.*\]\s*)+",
+                "^即使如此依旧步步进逼第(\d+)集(\[.*\]\s*)+",
+                "Soredemo Ayumu wa Yosetekuru - {} {}",
+            ]
+        ]
+        i = rss.map_title(items)
+        self.assertEqual(
+            i[0].name,
+            "Soredemo Ayumu wa Yosetekuru - 3 [Bilibili][WEB-DL][1080P][AVC_AAC][CHT][MP4][bangumi.online]",
+        )
+        self.assertEqual(
+            i[1].name,
+            "Soredemo Ayumu wa Yosetekuru - 03 [1080P][Bilibili][WEB-DL][AAC AVC][CHT CHS][MP4]",
+        )
+        self.assertEqual(
+            i[2].name,
+            "Soredemo Ayumu wa Yosetekuru - 4 [1080P]",
+        )

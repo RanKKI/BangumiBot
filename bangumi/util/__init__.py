@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Any, Callable, Tuple
 
 from dotenv import load_dotenv
 
@@ -25,3 +26,11 @@ def init_folders():
 def setup_env():
     if os.path.exists(".env"):
         load_dotenv(".env")
+
+
+def first(arr: list, f: Callable[[Any], Tuple[None, Any]]) -> Any:
+    for item in arr:
+        ret = f(item)
+        if ret:
+            return ret
+    return None

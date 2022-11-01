@@ -13,6 +13,7 @@ from bangumi.util import (
     filter_download_item_by_rules,
     from_dict_to_dataclass,
     rebuild_url,
+    first,
 )
 from tabulate import tabulate
 
@@ -144,20 +145,21 @@ class RSS(Configurable):
         return items
 
     def map_title(self, items: List[WaitDownloadItem]) -> List[WaitDownloadItem]:
-        for item in items:
-            for matcher, result in self.mapper:
-                ret = re.match(matcher, item.name)
-                if not ret:
+        def map_title(item: WaitDownloadItem) -> WaitDownloadItem:
+            for *matcher, result in self.mapper:
+                name = item.name
+                data = first(matcher, lambda x: re.match(x, name))
+                if not data:
                     continue
-                val = ret.groups()
                 try:
-                    old_name = item.name
-                    item.name = result.format(*val)
-                    logger.debug(f"Mapped title from {old_name} to {item.name}")
+                    item.name = result.format(*data.groups())
+                    logger.debug(f"Mapped title from {name} to {item.name}")
                 except Exception as e:
-                    logger.error(f"Failed to format name {item.name} {val} {e}")
+                    logger.error(f"Failed to format name {item.name} {data} {e}")
                 break
-        return items
+            return item
+
+        return list(map(map_title, items))
 
     def filter_by_time(
         self, items: List[WaitDownloadItem], last_scrape_time: int

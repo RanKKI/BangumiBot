@@ -92,7 +92,7 @@ class RSS(Configurable):
         mapper = self.mapper[:]
         for item in mapper:
             invalid = not isinstance(item, Iterable)
-            invalid = invalid or len(item) != 2
+            invalid = invalid or len(item) <= 1
             if invalid:
                 logger.error(f"Invalid title mapper: {item}")
                 self.mapper.remove(item)

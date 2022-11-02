@@ -228,8 +228,9 @@ class RSS(Configurable):
 
         if self.mapper:
             logger.info("RSS Mapper:")
-        for a, b in self.mapper:
-            logger.info(f"┌ {a}")
-            logger.info(f"└ {b}")
-        if self.mapper:
+            for *a, b in self.mapper:
+                logger.info(f"┌ {a[0]}")
+                for extra in a[1:]:
+                    logger.info(f"| {extra}")
+                logger.info(f"└ {b}")
             logger.info("")

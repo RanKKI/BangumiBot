@@ -1,10 +1,14 @@
 import unittest
 
-from fastapi import Path
-
-from bangumi.rss import RSS
 from bangumi.entitiy import WaitDownloadItem
-from bangumi.util import setup_test_env, filter_download_item_by_rules
+from bangumi.rss import RSS
+from bangumi.rss.mikan import MiKanRSS
+from bangumi.util import (
+    filter_download_item_by_content_length,
+    filter_download_item_by_rules,
+    setup_test_env,
+)
+import bs4
 
 
 class TestRawParser(unittest.TestCase):
@@ -13,7 +17,21 @@ class TestRawParser(unittest.TestCase):
         return super().setUp()
 
     def test_config(self):
-        RSS().load_config({})
+        rss = RSS()
+        rss.load_config(
+            {
+                "urls": [
+                    {
+                        "url": "https://dmhy.org/topics/rss/rss.xml",
+                        "rules": [".*[^(來自深淵)|(来自深渊)].*", ".*21321*"],
+                        "min_size": 18423,
+                    },
+                ],
+            }
+        )
+        self.assertEqual(len(rss.sites), 1)
+        self.assertEqual(rss.sites[0].url, "https://dmhy.org/topics/rss/rss.xml")
+        self.assertEqual(rss.sites[0].min_size, 18423)
 
     def test_order(self):
         rss = RSS()
@@ -240,3 +258,28 @@ class TestRawParser(unittest.TestCase):
             ret[0].name,
             "[桜都字幕组] Fuufu Ijou, Koibito Miman 第04集 [1080p][简繁内封]",
         )
+
+    def test_min_content_length(self):
+        items = [
+            WaitDownloadItem(
+                name="[桜都字幕组] 夫妇以上，恋人未满。/   Fuufu Ijou, Koibito Miman. [04][1080p][简繁内封]",
+                url="https://mikanani.me/Download/20220719/6eaa5bb1584dbe437444bbd2b42e071ac88a50ed.torrent",
+                pub_at=10,
+                content_length=10 * 1024 * 1024,
+            )
+        ]
+        items = filter_download_item_by_content_length(9 * 1024 * 1024, items)
+        self.assertEqual(len(items), 1)
+
+        items = filter_download_item_by_content_length(11 * 1024 * 1024, items)
+        self.assertEqual(len(items), 0)
+
+    def test_mikan_parser(self):
+        mikan = MiKanRSS()
+        root = bs4.BeautifulSoup(
+            """<rss><channel><item><guid isPermaLink="false">[V2][织梦字幕组][电锯人 Chainsaw Man][04集][1080P][AVC][简日双语]</guid><link>https://mikanani.me/Home/Episode/2f0854887541481bbe747c113a1083bf2637ccd2</link><title>[V2][织梦字幕组][电锯人 Chainsaw Man][04集][1080P][AVC][简日双语]</title><description>[V2][织梦字幕组][电锯人 Chainsaw Man][04集][1080P][AVC][简日双语][421.56 MB]</description><torrent xmlns="https://mikanani.me/0.1/"><link>https://mikanani.me/Home/Episode/2f0854887541481bbe747c113a1083bf2637ccd2</link><contentLength>442037696</contentLength><pubDate>2022-11-03T08:10:43.331</pubDate></torrent><enclosure type="application/x-bittorrent" length="442037696" url="https://mikanani.me/Download/20221103/2f0854887541481bbe747c113a1083bf2637ccd2.torrent"/></item></channel></rss>""", features="xml"
+        )
+        items = mikan.parse(root)
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0].name, "[V2][织梦字幕组][电锯人 Chainsaw Man][04集][1080P][AVC][简日双语]")
+        self.assertEqual(items[0].content_length, 442037696)

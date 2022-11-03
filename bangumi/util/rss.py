@@ -17,3 +17,9 @@ def filter_download_item_by_rules(
             ret.append(item)
 
     return ret
+
+
+def filter_download_item_by_content_length(
+    length: int, items: List[WaitDownloadItem]
+) -> List[WaitDownloadItem]:
+    return [item for item in items if item.content_length >= length]

@@ -17,11 +17,13 @@ class MiKanRSS(RSSParser):
             title = item.find("title").text
             url = item.find("enclosure").get("url")
             pub_date = item.find("torrent").find("pubDate").text
+            content_length = int(item.find("torrent").find("contentLength").text)
             ret.append(
                 WaitDownloadItem(
                     name=title,
                     url=url,
                     pub_at=get_timestamp(pub_date),
+                    content_length=content_length,
                 )
             )
         return ret

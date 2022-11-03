@@ -11,6 +11,7 @@ from bangumi.parser import Parser
 from bangumi.util import (
     dynamic_get_class,
     filter_download_item_by_rules,
+    filter_download_item_by_content_length,
     from_dict_to_dataclass,
     rebuild_url,
     first,
@@ -128,6 +129,8 @@ class RSS(Configurable):
         # items = self.filter_by_time(items, last_scrape_time)
         items = filter_download_item_by_rules(self.rules, items)
         items = filter_download_item_by_rules(site.rules, items)
+        if site.min_size > 0:
+            items = filter_download_item_by_content_length(site.min_size, items)
         items = self.filter_by_duplicate(items)
         return items
 

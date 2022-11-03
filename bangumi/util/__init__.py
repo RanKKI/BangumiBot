@@ -9,7 +9,7 @@ from bangumi.consts.env import Env
 from .files import move_file, get_relative_path, setup_test_env
 from .logger import setup_logger
 from .decorator import safe_call
-from .rss import filter_download_item_by_rules
+from .rss import filter_download_item_by_rules, filter_download_item_by_content_length
 from .clz import from_dict_to_dataclass
 from .plugin import dynamic_get_class
 from .datetime import get_timestamp

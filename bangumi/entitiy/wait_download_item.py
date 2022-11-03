@@ -9,6 +9,7 @@ class WaitDownloadItem:
     name: str
     url: str
     pub_at: int = 0
+    content_length: int = 0
 
     @property
     def hash(self):

@@ -28,7 +28,7 @@
  - Setup the downloader config, i.e. type, username, password
  - Set redis IP, Port and password
  - Set scrape frequency
- - Copy ./config_example tp ./config
+ - Copy ./config_example to ./config
  - Edit [RSS](#rss) Config `./config/rss.json `
  - Edit [Notification](#notification) Config `./config/notification.json`
  - Install all required libs  `pip install -r requirements.txt`

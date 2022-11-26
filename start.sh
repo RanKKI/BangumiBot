@@ -1,5 +1,8 @@
 #!/bin/bash
 
+PUID=${PUID:=0}
+PGID=${PGID:=0}
+
 chown -R ${PUID}:${PGID} \
     /src \
     /config

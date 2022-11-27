@@ -2,6 +2,7 @@
 
 PUID=${PUID:=0}
 PGID=${PGID:=0}
+UMASK=${UMASK:=777}
 
 chown -R ${PUID}:${PGID} \
     /src \
@@ -19,5 +20,9 @@ if [[ "$(stat -c '%u' /downloads)" != "${PUID}" ]] || [[ "$(stat -c '%g' /downlo
     chown ${PUID}:${PGID} \
         /downloads
 fi
+
+umask ${UMASK}
+
+echo -e "PUID=${PUID}\nPGID=${PGID}\numask=${UMASK}"
 
 su-exec ${PUID}:${PGID} uvicorn main:app --host 0.0.0.0 --log-config conf/log.yml

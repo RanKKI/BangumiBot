@@ -8,18 +8,10 @@ chown -R ${PUID}:${PGID} \
     /src \
     /config
 
-if [[ "$(stat -c '%u' /cache)" != "${PUID}" ]] || [[ "$(stat -c '%g' /cache)" != "${PGID}" ]]; then
-    chown ${PUID}:${PGID} \
-        /cache
-fi
-if [[ "$(stat -c '%u' /media)" != "${PUID}" ]] || [[ "$(stat -c '%g' /media)" != "${PGID}" ]]; then
-    chown ${PUID}:${PGID} \
-        /media
-fi
-if [[ "$(stat -c '%u' /downloads)" != "${PUID}" ]] || [[ "$(stat -c '%g' /downloads)" != "${PGID}" ]]; then
-    chown ${PUID}:${PGID} \
-        /downloads
-fi
+chown ${PUID}:${PGID} \
+    /cache \
+    /media \
+    /downloads
 
 umask ${UMASK}
 

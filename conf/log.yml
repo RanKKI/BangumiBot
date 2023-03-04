@@ -4,7 +4,7 @@ disable_existing_loggers: false
 formatters:
   standard:
     format: "%(asctime)s - [%(levelname).4s] - %(message)s"
-    datefmt: '%Y-%m-%d %H:%M:%S'
+    datefmt: "%Y-%m-%d %H:%M:%S"
 
 handlers:
   console:
@@ -18,6 +18,6 @@ loggers:
       propagate: true
 
 root:
-  level: INFO
+  level: DEBUG
   handlers: [console]
   propagate: no

@@ -30,6 +30,8 @@ class Env(Enum):
     # 是否持续做种
     SEEDING = PREFIX + "SEEDING"
 
+    OPENAI_API_KEY = PREFIX + "OPENAI_API_KEY"
+
     @staticmethod
     def get(key: "Env", default="", *, type: Union[str, bool, int, Path] = str) -> str:
         val = os.environ.get(key.value, default)
@@ -65,4 +67,5 @@ class Env(Enum):
             ["Media", env(Env.MEDIA_FOLDER)],
             ["Config", env(Env.CONFIG_PATH)],
             ["Seeding", Env.get(Env.SEEDING, False, type=bool)],
+            ["OpenAI Key", "***"],
         ]

@@ -42,9 +42,13 @@ class RedisDB(object):
         self.client.delete(hash_)
 
     def update_last_checked_time(self):
+        if not self.client:
+            return
         self.client.set("last_checked_time", int(time()))
 
     def get_last_checked_time(self) -> int:
+        if not self.client:
+            return 0
         return int(self.client.get("last_checked_time") or 0)
 
     def add_to_torrent_queue(
@@ -95,6 +99,8 @@ class RedisDB(object):
         self.client.set(f"seeding:{_hash}", 1)
 
     def init(self) -> bool:
+        if not self.client:
+            return False
         if self.client.get("initd"):
             return False
         self.client.set("initd", 1)

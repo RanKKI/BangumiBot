@@ -17,16 +17,15 @@ class TitleInfo:
 
 @dataclass
 class SeasonInfo:
-    def __init__(self) -> None:
-        self.raw: str = None
-        self.number: int = None
+    raw: str = ""
+    number: int = 0
 
 
 @dataclass
 class EpisodeInfo:
-    def __init__(self) -> None:
-        self.raw: str = None
-        self.number: int = None
+
+    raw: str = ""
+    number: int = 0
 
 
 @dataclass

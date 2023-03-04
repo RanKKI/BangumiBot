@@ -101,7 +101,6 @@ class Aria2Downloader(Downloader):
                     add = True
 
             if state & DownloadState.FINISHED:
-
                 if download.status == "complete":
                     add = True
                 if (

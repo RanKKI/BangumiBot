@@ -70,7 +70,6 @@ logger = logging.getLogger(__name__)
 
 
 class AIParse(object):
-
     # make http request to openai api
     @staticmethod
     def request(title: str) -> str:

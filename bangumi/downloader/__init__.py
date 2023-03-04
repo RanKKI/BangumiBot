@@ -10,7 +10,6 @@ from .pikpak import PikpakDownloader
 
 
 def build_downloader() -> Downloader:
-
     client_type = Env.get(Env.CLIENT_TYPE, "").lower()
     host = Env.get(Env.CLIENT_IP, None)
     port = Env.get(Env.CLIENT_PORT, None)

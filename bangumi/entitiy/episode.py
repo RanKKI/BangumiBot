@@ -23,7 +23,6 @@ class SeasonInfo:
 
 @dataclass
 class EpisodeInfo:
-
     raw: str = ""
     number: int = 0
 

@@ -35,6 +35,9 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
       - BANGUMI_CHECK_INTERVAL=600
       - BANGUMI_CLIENT_TYPE=qbittorrent
       - BANGUMI_CLIENT_IP=10.1.0.21

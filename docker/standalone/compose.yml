@@ -14,6 +14,9 @@ services:
       - BANGUMI_REDIS_PORT=6379
       - BANGUMI_REDIS_PASSWORD=
       - TZ=Asia/Shanghai
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
     ports:
       - 8000:8000
     volumes:

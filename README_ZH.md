@@ -11,6 +11,10 @@
 
 加上 [EstrellaXD/Auto_Bangumi](https://github.com/EstrellaXD/Auto_Bangumi) 与 qBittorrent 耦合性太强了，于是有重写的想法，其中文本正则处理的代码出自 [EstrellaXD/Auto_Bangumi/auto_bangumi/parser/analyser/raw_parser.py](https://github.com/EstrellaXD/Auto_Bangumi/blob/c9c2b28389aac6ac4d778cdc7de1a77ca024b97e/auto_bangumi/parser/analyser/raw_parser.py)。
 
+## 新增 AI 支持
+
+基于 OpenAI 的 GPT 模型 API 实现将文件名转换成指定格式
+
 提供高自定义操作，可以自己写插件支持本项目不支持的 RSS 站点，甚至支持非 RSS 站点
 
 <img src="/images/img_1.jpg" width=30% /> <img src="/images/img_2.jpg" width=50% />

@@ -81,6 +81,10 @@ docker run --name bangumi \
   -e BANGUMI_REDIS_HOST="10.1.0.20" \
   -e BANGUMI_REDIS_PORT="6379" \
   -e BANGUMI_REDIS_PASSWORD="" \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e UMASK=022 \
+  -e TZ=Asia/shanghai \
   --ip 10.1.0.22 \
   -p 8000:8000 \
   -v /media:/media \

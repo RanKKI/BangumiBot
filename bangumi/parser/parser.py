@@ -142,18 +142,6 @@ class Parser:
 
     @staticmethod
     def parse_bangumi_name(raw_title: str) -> Union[Episode, None]:
-        """
-        如果符合 XXXXXXXX S01E01 直接返回
-        """
-        if ret := re.match(r"(.*)S(\d{1,2})E(\d{1,2})", raw_title):
-            epi = Episode()
-            epi.title = ret.group(1)
-            info.season_info.number, info.season_info.raw = int(
-                ret.group(2)
-            ), ret.group(2)
-            epi.ep_info.number = int(ret.group(3))
-            return epi
-
         open_ai_key = Env.get(Env.OPENAI_API_KEY, "", type=str)
         if open_ai_key:
             return AIParse.prase(raw_title)

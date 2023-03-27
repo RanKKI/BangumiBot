@@ -11,7 +11,9 @@ from collections import defaultdict
 SYSTEM_PROMPT = """
 你需要将我的输入转换成 JSON 类型， title 为字符串， season 为整数， episode 为整数， dpi 为字符串， subtitle 为字符串， source 为字符串， group 为字符串。
 
-title 优选考虑英文、日文罗马文。如果没有英文、日文罗马文，那么就考虑将中文翻译成英文.
+title 优选使用英文、日文罗马文。
+
+如果 title 是中文，请翻译成英文
 
 例如 [ANi] NieRAutomata Ver11a - 尼尔：自动人形 Ver1.1a - 05 [1080P][Baha][WEB-DL][AAC AVC][CHT][MP4][839.6 MB] [复制磁连] [资源简介]  将会被转成
 ```

@@ -20,5 +20,5 @@ async def add_torrents_by_rss(r: AddRss):
     config.load_config()
 
     items = await rss.scrape_url(RSSSite(url=r.url))
-    # redisDB.add_to_torrent_queue(items)
+    redisDB.add_to_torrent_queue(items)
     return {"message": "OK!", "items": items}

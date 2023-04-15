@@ -45,7 +45,8 @@ class TransmissionDownloader(Downloader):
         logger.info(f"Transmission Connecting to {host}:{port}")
 
         self.client = Client(
-            host=f"{host}:{port}",
+            host=host,
+            port=port,
             username=username,
             password=password,
         )

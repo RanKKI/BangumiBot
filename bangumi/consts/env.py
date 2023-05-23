@@ -33,7 +33,9 @@ class Env(Enum):
     OPENAI_API_KEY = PREFIX + "OPENAI_API_KEY"
 
     @staticmethod
-    def get(key: "Env", default="", *, valueType: Union[str, bool, int, Path] = str) -> str:
+    def get(
+        key: "Env", default="", *, valueType: Union[str, bool, int, Path] = str
+    ) -> str:
         val = os.environ.get(key.value, default)
         if valueType == str:
             return val

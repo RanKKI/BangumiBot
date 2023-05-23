@@ -61,7 +61,7 @@ class ConfigChangeHandler(FileSystemEventHandler):
 class ConfigManager(object):
     def __init__(self) -> None:
         self.handler = ConfigChangeHandler(self.on_change)
-        self.config_path: Path = Env.get(Env.CONFIG_PATH, "/config", type=Path)
+        self.config_path: Path = Env.get(Env.CONFIG_PATH, "/config", valueType=Path)
         self.listener = ConfigChangeListener(self.handler, str(self.config_path))
         self.config_map = defaultdict(lambda: [])
 

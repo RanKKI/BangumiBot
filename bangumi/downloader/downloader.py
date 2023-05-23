@@ -27,7 +27,7 @@ TorrentFinishedCB = Callable[[DownloadItem], None]
 class Downloader(ABC):
     def __init__(self):
         self.on_torrent_finished_callback: TorrentFinishedCB = None
-        self.cache_folder = Env.get(Env.CACHE_FOLDER, ".cache", type=Path)
+        self.cache_folder = Env.get(Env.CACHE_FOLDER, ".cache", valueType=Path)
 
     def add_torrent(self, url_or_magnet: str) -> bool:
         logger.debug(f"Adding torrent {url_or_magnet}")

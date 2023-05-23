@@ -142,7 +142,7 @@ class Parser:
 
     @staticmethod
     def parse_bangumi_name(raw_title: str) -> Union[Episode, None]:
-        open_ai_key = Env.get(Env.OPENAI_API_KEY, "", type=str)
+        open_ai_key = Env.get(Env.OPENAI_API_KEY, "", valueType=str)
         if open_ai_key:
             return AIParse.prase(raw_title)
         try:

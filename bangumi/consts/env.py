@@ -33,22 +33,24 @@ class Env(Enum):
     OPENAI_API_KEY = PREFIX + "OPENAI_API_KEY"
 
     @staticmethod
-    def get(key: "Env", default="", *, type: Union[str, bool, int, Path] = str) -> str:
+    def get(key: "Env", default="", *, valueType: Union[str, bool, int, Path] = str) -> str:
         val = os.environ.get(key.value, default)
-        if type == str:
+        if valueType == str:
             return val
-        if type == int:
+        if valueType == int:
             return int(val)
-        if type == bool:
+        if valueType == bool:
+            if type(val) == bool:
+                return val
             return val.lower() in ["yes", "true", "1"]
-        if type == Path:
+        if valueType == Path:
             return Path(val)
-        raise ValueError(f"Unknown type: {type}")
+        raise ValueError(f"Unknown type: {valueType}")
 
     @staticmethod
     def as_table():
         def env(key: Env, default=""):
-            return Env.get(key, default, type=str)
+            return Env.get(key, default, valueType=str)
 
         return [
             ["Log Level", env(Env.LOGGER_LEVEL)],
@@ -66,6 +68,6 @@ class Env(Enum):
             ["Cache", env(Env.CACHE_FOLDER)],
             ["Media", env(Env.MEDIA_FOLDER)],
             ["Config", env(Env.CONFIG_PATH)],
-            ["Seeding", Env.get(Env.SEEDING, False, type=bool)],
+            ["Seeding", Env.get(Env.SEEDING, False, valueType=bool)],
             ["OpenAI Key", "***"],
         ]

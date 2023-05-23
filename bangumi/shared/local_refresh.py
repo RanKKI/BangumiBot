@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def refresh_local(redisDB, downloader):
     logger.info("refreshing local data...")
-    media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
+    media = Env.get(Env.MEDIA_FOLDER, "media", valueType=Path)
     exists = set()
     for item in glob(str(media / "**/*"), recursive=True):
         if not os.path.isfile(item):
@@ -30,7 +30,7 @@ def refresh_local(redisDB, downloader):
     """
     恢复 Redis 中的正在做种的项目
     """
-    if Env.get(Env.SEEDING, False, type=bool):
+    if Env.get(Env.SEEDING, False, valueType=bool):
         try:
             completed = downloader.get_downloads(DownloadState.FINISHED)
         except requests.exceptions.ConnectionError as e:

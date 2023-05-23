@@ -10,7 +10,7 @@ def get_relative_path(path: Path) -> Path:
     """
     获取相对路径
     """
-    download_folder = Env.get(Env.DOWNLOAD_FOLDER, "downloads", type=Path)
+    download_folder = Env.get(Env.DOWNLOAD_FOLDER, "downloads", valueType=Path)
     return download_folder / path.name
 
 

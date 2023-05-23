@@ -17,8 +17,8 @@ from .url import rebuild_url
 
 
 def init_folders():
-    cache = Env.get(Env.CACHE_FOLDER, "cache", type=Path)
-    media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
+    cache = Env.get(Env.CACHE_FOLDER, "cache", valueType=Path)
+    media = Env.get(Env.MEDIA_FOLDER, "media", valueType=Path)
     media.mkdir(parents=True, exist_ok=True)
     cache.mkdir(parents=True, exist_ok=True)
 

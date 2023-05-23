@@ -74,7 +74,7 @@ class AIParse(object):
     @staticmethod
     def request(title: str) -> str:
         logger.debug("ai parse request %s", title)
-        openai.api_key = Env.get(Env.OPENAI_API_KEY, type=str)
+        openai.api_key = Env.get(Env.OPENAI_API_KEY, valueType=str)
 
         completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",

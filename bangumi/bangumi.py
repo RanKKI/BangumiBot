@@ -50,7 +50,7 @@ class Bangumi(object):
         try:
             result = Parser.parse_bangumi_name(info.name)
             logger.info(f"Renaming {file.name} to {result.formatted}")
-            seeding = Env.get(Env.SEEDING, False, type=bool)
+            seeding = Env.get(Env.SEEDING, False, valueType=bool)
             move_file(file, result, seeding=seeding)
             return result.formatted, seeding
         except Exception as e:
@@ -146,7 +146,7 @@ class Bangumi(object):
             logger.info(f"Added {len(failed_added)} failed torrents to queue")
 
     async def loop(self):
-        INTERVAL = Env.get(Env.CHECK_INTERVAL, 60 * 10, type=int)
+        INTERVAL = Env.get(Env.CHECK_INTERVAL, 60 * 10, valueType=int)
 
         while self.is_running:
             current = int(time())

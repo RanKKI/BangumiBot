@@ -58,7 +58,7 @@ class Episode:
         return f"{self.title} S{season}E{ep}"
 
     def get_full_path(self, ext: str = "") -> Path:
-        media = Env.get(Env.MEDIA_FOLDER, "media", type=Path)
+        media = Env.get(Env.MEDIA_FOLDER, "media", valueType=Path)
         season = self.season_info.number
         season_folder = f"Season {int(season)}"
         if season % 1 == 0.5:

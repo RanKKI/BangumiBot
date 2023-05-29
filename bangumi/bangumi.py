@@ -87,7 +87,8 @@ class Bangumi(object):
             return
 
         # 过滤标记为做种的已完成项目
-        completed = [item for item in completed if not redisDB.is_seeding(item.hash)]
+        # there might be torrents that are already in the downloader but not added by us
+        completed = [item for item in completed if redisDB.get(item.hash) and not redisDB.is_seeding(item.hash)]
 
         if len(completed) == 0:
             return
